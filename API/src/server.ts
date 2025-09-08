@@ -2,6 +2,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 import { connectDB } from "./config/db";
+import { ENV } from "./config/env";
 import { errorHandler } from "./middleware/errorHandler";
 import routes from "./routes/index.routes";
 import { swaggerDocs } from "./swagger";
@@ -16,15 +17,19 @@ app.use(express.json());
 connectDB(process.env.MONGO_URI || "mongodb://127.0.0.1:27017/payinvflow");
 
 // Routes
+app.get("/", (_, res) => {
+  res.send(`Running in ${ENV.NODE_ENV} mode 🚀`);
+});
+
 app.use("/api", routes);
 
 // Swagger docs
-const PORT = process.env.PORT || 5000;
-swaggerDocs(app, Number(PORT));
+const PORT = ENV.PORT;
+swaggerDocs(app, Number(ENV.PORT));
 
 // Global Error Handler (must be after routes)
 app.use(errorHandler);
 
-app.listen(PORT, () =>
-  console.log(`🚀 PayInvoFlow API running on http://localhost:${PORT}`)
+app.listen(ENV.PORT, () =>
+  console.log(`🚀 PayInvoFlow API running on http://localhost:${ENV.PORT}`)
 );
