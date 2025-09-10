@@ -33,6 +33,12 @@ export class InvoiceController extends BaseController<IInvoice> {
     res.send(pdfBuffer);
   };
 
+  exportPdfFile = async (req: Request, res: Response) => {
+    const pdfBuffer = await this.invoiceService.exportPdfFile();
+    res.setHeader("Content-Type", "application/pdf");
+    res.send(pdfBuffer);
+  };
+
   // Get invoices by Client ID
   getByClient = async (req: Request, res: Response) => {
     const result = await this.invoiceService.getByClient(req.params.clientId);

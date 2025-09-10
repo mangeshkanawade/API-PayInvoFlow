@@ -1,17 +1,18 @@
 import * as fs from "fs";
 import path from "path";
-// import { create } from "pdf-creator-node";
-import { pdfOptions } from "../helper/pdfOptions";
-import { IClient } from "../models/client.model";
-import { ICompany } from "../models/company.model";
 import { IInvoice, InvoiceModel } from "../models/invoice.model";
 import { InvoiceItemModel } from "../models/invoiceitem.model";
 import { BaseRepository } from "../repositories/base.repository";
 import { BaseService } from "../services/base.service";
-const pdf = require("pdf-creator-node");
+
+import chromium from "@sparticuz/chromium";
+import Handlebars from "handlebars";
+import puppeteer from "puppeteer";
+import puppeteerCore, { LaunchOptions } from "puppeteer-core";
+// import puppeteerCore from "puppeteer-core";
 
 export class InvoiceService extends BaseService<IInvoice> {
-  constructor(public repo: BaseRepository<IInvoice>, jwtSecret: string) {
+  constructor(public repo: BaseRepository<IInvoice>) {
     super(repo);
   }
 
@@ -23,9 +24,7 @@ export class InvoiceService extends BaseService<IInvoice> {
     return InvoiceModel.findByIdAndUpdate(id, { status }, { new: true });
   }
 
-  buildInvoiceData(payload: any) {
-    if (payload && typeof payload === "object") return payload;
-
+  buildInvoiceData() {
     return {
       provider: {
         name: "Ansh Enterprises",
@@ -100,70 +99,7 @@ export class InvoiceService extends BaseService<IInvoice> {
   }
 
   async exportPdf(id: string): Promise<Buffer> {
-    // 1. Fetch invoice with relations
-    const invoice = await InvoiceModel.findById(id)
-      .populate<{ client: IClient }>("client")
-      .populate<{ company: ICompany }>("company")
-      .lean();
-
-    if (!invoice) {
-      throw new Error("Invoice not found");
-    }
-
-    // 2. Fetch items
-    const items = await InvoiceItemModel.find({ invoice: invoice._id }).lean();
-
-    // 3. Build invoice data object
-    const subtotal = items.reduce(
-      (sum, item) => sum + (item.quantity || 0) * item.amount,
-      0
-    );
-    const tax = (subtotal * 20) / 100;
-    const grandTotal = subtotal + tax;
-
-    const invoiceData = {
-      invoice,
-      items,
-      totals: {
-        subtotal,
-        tax,
-        grandTotal,
-      },
-    };
-
-    try {
-      // 4. Load HTML template
-      const templatePath = path.join(__dirname, "../views/template.html");
-      const html = await fs.promises.readFile(templatePath, "utf-8");
-
-      // 5. Ensure docs directory exists
-      const docsDir = path.join(__dirname, "../docs");
-      await fs.promises.mkdir(docsDir, { recursive: true });
-
-      // 6. Generate unique filename
-      const filename = `${Date.now()}_${Math.floor(Math.random() * 1e6)}.pdf`;
-      const filePath = path.join(docsDir, filename);
-
-      // 7. Create PDF
-      const document = {
-        html,
-        // data: invoiceData,
-        data: this.buildInvoiceData(null),
-        path: filePath,
-        type: "buffer", // return as buffer
-      };
-
-      const result: Buffer = await pdf.create(document, pdfOptions);
-      // result is the PDF Buffer since type = "buffer"
-
-      // 8. Optionally, also save the file for public access
-      await fs.promises.writeFile(filePath, result);
-
-      return result;
-    } catch (err) {
-      console.error("PDF generation failed:", err);
-      throw new Error("PDF generation failed");
-    }
+    return Buffer.alloc(0);
   }
 
   async getByClient(clientId: string) {
@@ -192,5 +128,82 @@ export class InvoiceService extends BaseService<IInvoice> {
       _id: itemId,
       invoice: invoiceId,
     });
+  }
+
+  async exportPdfFile(): Promise<Buffer> {
+    try {
+      // 1. Load HTML template
+      const templatePath = path.join(__dirname, "../views/template.html");
+      const htmlTemplate = await fs.promises.readFile(templatePath, "utf-8");
+
+      // 2. Compile template with Handlebars
+      const template = Handlebars.compile(htmlTemplate);
+      const val = this.buildInvoiceData();
+      const html = template({
+        ...val,
+      });
+
+      // 3. Launch Puppeteer
+      // const browser = await puppeteer.launch({
+      //   args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      // });
+      // const page = await browser.newPage();
+
+      // Fallback for executablePath
+
+      // const executablePath =
+      //   process.env.NODE_ENV === "production"
+      //     ? (await chromium.executablePath) || "/usr/bin/chromium-browser"
+      //     : puppeteer.executablePath();
+
+      // const browser = await puppeteer.launch({
+      //   args: process.env.NODE_ENV === "production" ? chromium.args : [],
+      //   defaultViewport: chromium.defaultViewport,
+      //   // executablePath,
+      //   executablePath: await chromium.executablePath,
+      //   headless: true,
+      // });
+
+      // const page = await browser.newPage();
+
+      // 3. launch
+      const isProd =
+        process.env.VERCEL_ENV === "production" ||
+        process.env.NODE_ENV === "production";
+      const browser = isProd
+        ? await puppeteerCore.launch({
+            args: [...chromium.args, "--disable-gpu", "--no-sandbox"],
+            defaultViewport: {
+              width: 1280,
+              height: 800,
+              deviceScaleFactor: 1,
+              isMobile: false,
+              hasTouch: false,
+              isLandscape: false,
+            },
+            executablePath: await chromium.executablePath(), // note: function call
+            headless: "shell",
+          } satisfies LaunchOptions)
+        : await puppeteer.launch({ channel: "chrome", headless: true });
+
+      const page = await browser.newPage();
+      // 4. Set HTML content
+      await page.setContent(html, { waitUntil: "load" });
+
+      // 5. Generate PDF buffer
+      const pdfBuffer = Buffer.from(
+        await page.pdf({
+          format: "A4",
+          printBackground: true,
+        })
+      );
+
+      await browser.close();
+
+      return pdfBuffer;
+    } catch (err) {
+      console.error("PDF generation failed:", err);
+      throw new Error("PDF generation failed. " + err);
+    }
   }
 }

@@ -11,12 +11,14 @@ export const errorHandler = (
 
   if (err instanceof ApiError) {
     return res.status(err.statusCode).json({
+      error: err.message,
       success: false,
       message: err.message,
     });
   }
 
   res.status(500).json({
+    error: err.message,
     success: false,
     message: "Something went wrong",
   });

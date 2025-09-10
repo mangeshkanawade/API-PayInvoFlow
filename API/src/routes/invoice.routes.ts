@@ -214,23 +214,43 @@ router.get("/history", controller.history);
  */
 router.put("/:id/status", controller.updateStatus);
 
+// /**
+//  * @openapi
+//  * /invoices/{id}/pdf:
+//  *   get:
+//  *     summary: Export invoice as PDF
+//  *     tags: [Invoices]
+//  *     parameters:
+//  *       - in: path
+//  *         name: id
+//  *         required: true
+//  *         schema:
+//  *           type: string
+//  *     responses:
+//  *       200:
+//  *         description: PDF generated successfully
+//  */
+// router.get("/:id/pdf", controller.exportPdf);
+
 /**
  * @openapi
- * /invoices/{id}/pdf:
+ * /invoices/pdf:
  *   get:
  *     summary: Export invoice as PDF
- *     tags: [Invoices]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
+ *     tags:
+ *       - Invoices
  *     responses:
  *       200:
  *         description: PDF generated successfully
+ *         content:
+ *           application/pdf:
+ *             schema:
+ *               type: string
+ *               format: binary
+ *       500:
+ *         description: Internal server error
  */
-router.get("/:id/pdf", controller.exportPdf);
+router.get("/:id/pdf", controller.exportPdfFile);
 
 /**
  * @openapi
