@@ -1,6 +1,4 @@
 import { Request, Response } from "express";
-import * as fs from "fs";
-import { pdfGenerator_Puppeteer } from "../helper/pdfGenerator";
 import { IInvoice } from "../models/invoice.model";
 import { InvoiceService } from "../services/invoice.service";
 import { BaseController } from "./base.controller";
@@ -33,30 +31,6 @@ export class InvoiceController extends BaseController<IInvoice> {
     const pdfBuffer = await this.invoiceService.exportPdf(req.params.id);
     res.setHeader("Content-Type", "application/pdf");
     res.send(pdfBuffer);
-  };
-
-  // Convert uploaded HTML → PDF
-  htmltopdf = async (req: Request, res: Response) => {
-    try {
-      const file = req.file;
-      if (!file) {
-        return res.status(400).send({ message: "HTML file is required" });
-      }
-
-      const htmlContent = fs.readFileSync(file.path, "utf8");
-      const pdfBuffer = await pdfGenerator_Puppeteer(htmlContent);
-
-      fs.unlinkSync(file.path); // cleanup temp file
-
-      res.setHeader("Content-Type", "application/pdf");
-      res.setHeader(
-        "Content-Disposition",
-        `attachment; filename=${file.originalname.replace(/\.html?$/, ".pdf")}`
-      );
-      res.send(pdfBuffer);
-    } catch (err: any) {
-      res.status(500).send({ message: err.message });
-    }
   };
 
   // Get invoices by Client ID

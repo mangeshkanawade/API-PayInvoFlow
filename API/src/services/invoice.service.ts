@@ -1,11 +1,20 @@
-import PDFDocument from "pdfkit";
+import * as fs from "fs";
+import path from "path";
+// import { create } from "pdf-creator-node";
+import { pdfOptions } from "../helper/pdfOptions";
 import { IClient } from "../models/client.model";
 import { ICompany } from "../models/company.model";
 import { IInvoice, InvoiceModel } from "../models/invoice.model";
 import { InvoiceItemModel } from "../models/invoiceitem.model";
+import { BaseRepository } from "../repositories/base.repository";
 import { BaseService } from "../services/base.service";
+const pdf = require("pdf-creator-node");
 
 export class InvoiceService extends BaseService<IInvoice> {
+  constructor(public repo: BaseRepository<IInvoice>, jwtSecret: string) {
+    super(repo);
+  }
+
   async history(filters: any) {
     return InvoiceModel.find(filters).populate("client").populate("company");
   }
@@ -14,79 +23,147 @@ export class InvoiceService extends BaseService<IInvoice> {
     return InvoiceModel.findByIdAndUpdate(id, { status }, { new: true });
   }
 
+  buildInvoiceData(payload: any) {
+    if (payload && typeof payload === "object") return payload;
+
+    return {
+      provider: {
+        name: "Ansh Enterprises",
+        gstin: "27BRFPK4610M1ZN",
+        address: "A/p Karegaon MIDC, Tal - Shirur, Dist - Pune 412220",
+        state: "Maharashtra",
+        // Use either a base64 logo or leave empty to show the placeholder
+        logo: "", // data URI or file path not used here; placeholder used in template
+        // logoBase64: "" // if using data:image/png;base64,...
+      },
+      receiver: {
+        name: "Hora Art Centre Pvt Ltd.",
+        gstin: "27AABCH2273C1ZZ",
+        address:
+          "Plot No/E-30, MIDC Area Karegaon, Tal - Shirur, Dist - Pune 412220",
+        state: "Maharashtra",
+      },
+      invoice: {
+        taxNo: "AE-25-26-61",
+        taxDate: "30/04/2025",
+        number: "AE-25-26-61",
+        date: "30/04/2025",
+        period: "01/04/2025 - 30/04/2025",
+        stateCode: "27",
+        stateName: "Maharashtra",
+      },
+      summary: {
+        totalEntries: 78,
+        vehicles: "MH 12 PQ 7136, MH 12 PQ 1920",
+        routes:
+          "HORA-LG, EVARY-HORA, PG1, PG2, NGM, Amber, CML, PG4, Savera, Cariar, NEEL Ind. Shirwal",
+      },
+      bank: {
+        name: "HDFC Bank",
+        branch: "Karegaon, Shirur, Pune",
+        account: "50200069436732",
+        ifsc: "HDFC0003160",
+      },
+      items: [
+        {
+          sr: 1,
+          date: "01/04/2025",
+          vehicle: "MH 12 PQ 7136",
+          particulars: "HORA - LG",
+          amount: "600.00",
+        },
+        {
+          sr: 2,
+          date: "02/04/2025",
+          vehicle: "MH 12 PQ 1920",
+          particulars: "EVARY - HORA",
+          amount: "1400.00",
+        },
+        {
+          sr: 3,
+          date: "02/04/2025",
+          vehicle: "MH 12 PQ 7136",
+          particulars: "HORA - PG1 - PG2 - NGM - PG4 - Amber - EML",
+          amount: "1800.00",
+        },
+        // ... add rows up to 78 as per invoice
+      ],
+      totals: {
+        subtotal: "107000.00",
+        cgst: "6420.00",
+        sgst: "6420.00",
+        grand: "119840.00",
+        inWords:
+          "One Lakh Nineteen Thousand Eight Hundred Forty Four Rupees Only",
+      },
+    };
+  }
+
   async exportPdf(id: string): Promise<Buffer> {
+    // 1. Fetch invoice with relations
     const invoice = await InvoiceModel.findById(id)
       .populate<{ client: IClient }>("client")
       .populate<{ company: ICompany }>("company")
       .lean();
 
-    if (!invoice) throw new Error("Invoice not found");
+    if (!invoice) {
+      throw new Error("Invoice not found");
+    }
 
-    const items = await InvoiceItemModel.find({ invoice: invoice._id });
+    // 2. Fetch items
+    const items = await InvoiceItemModel.find({ invoice: invoice._id }).lean();
 
-    const doc = new PDFDocument({ margin: 50 });
-    const buffers: Uint8Array[] = [];
+    // 3. Build invoice data object
+    const subtotal = items.reduce(
+      (sum, item) => sum + (item.quantity || 0) * item.amount,
+      0
+    );
+    const tax = (subtotal * 20) / 100;
+    const grandTotal = subtotal + tax;
 
-    doc.on("data", (chunk) => buffers.push(chunk));
+    const invoiceData = {
+      invoice,
+      items,
+      totals: {
+        subtotal,
+        tax,
+        grandTotal,
+      },
+    };
 
-    return new Promise<Buffer>((resolve, reject) => {
-      doc.on("end", () => resolve(Buffer.concat(buffers)));
-      doc.on("error", reject);
+    try {
+      // 4. Load HTML template
+      const templatePath = path.join(__dirname, "../views/template.html");
+      const html = await fs.promises.readFile(templatePath, "utf-8");
 
-      // ===== Invoice Header =====
-      doc.fontSize(20).text("INVOICE", { align: "center" });
-      doc.moveDown();
-      doc.fontSize(12).text(`Invoice #: ${invoice.invoiceNumber}`);
-      doc.text(`Date: ${invoice.invoiceDate.toDateString()}`);
-      doc.moveDown();
+      // 5. Ensure docs directory exists
+      const docsDir = path.join(__dirname, "../docs");
+      await fs.promises.mkdir(docsDir, { recursive: true });
 
-      // ===== Client Details =====
-      const client = invoice.client as unknown as IClient;
-      doc.fontSize(14).text("Client:", { underline: true });
-      if (client) {
-        doc.text(`Name: ${client.name}`);
-        doc.text(`Email: ${client.email}`);
-        doc.text(`Phone: ${client.phone}`);
-        doc.text(`Address: ${client.address}`);
-        doc.text(`GSTIN: ${client.gstin}`);
-      }
-      doc.moveDown();
+      // 6. Generate unique filename
+      const filename = `${Date.now()}_${Math.floor(Math.random() * 1e6)}.pdf`;
+      const filePath = path.join(docsDir, filename);
 
-      // ===== Company Details =====
-      const company = invoice.company as unknown as ICompany;
-      doc.fontSize(14).text("Company:", { underline: true });
-      if (company) {
-        doc.text(`Name: ${company.companyName}`);
-        doc.text(`Email: ${company.email}`);
-        doc.text(`Phone: ${company.phone}`);
-        doc.text(`GSTIN: ${company.gstin}`);
-        doc.text(`Bank: ${company.bankName}, Branch: ${company.bankBranch}`);
-        doc.text(
-          `Account No: ${company.accountNumber}, IFSC: ${company.ifscCode}`
-        );
-      }
-      doc.moveDown();
+      // 7. Create PDF
+      const document = {
+        html,
+        // data: invoiceData,
+        data: this.buildInvoiceData(null),
+        path: filePath,
+        type: "buffer", // return as buffer
+      };
 
-      // ===== Items =====
-      doc.fontSize(14).text("Items:", { underline: true });
-      items.forEach((item, i) => {
-        doc.text(
-          `${i + 1}. ${item.particulars} | Amount: ₹${
-            item.amount
-          } | Date: ${item.date.toDateString()}`
-        );
-      });
-      doc.moveDown();
+      const result: Buffer = await pdf.create(document, pdfOptions);
+      // result is the PDF Buffer since type = "buffer"
 
-      // ===== Totals =====
-      doc.fontSize(14).text(`Subtotal: ₹${invoice.subtotal}`);
-      doc.text(`CGST (${invoice.cgstRate}%): ₹${invoice.cgstAmount}`);
-      doc.text(`SGST (${invoice.sgstRate}%): ₹${invoice.sgstAmount}`);
-      doc.text(`Grand Total: ₹${invoice.grandTotal}`);
-      doc.text(`Amount in Words: ${invoice.amountInWords}`);
+      // 8. Optionally, also save the file for public access
+      await fs.promises.writeFile(filePath, result);
 
-      doc.end();
-    });
+      return result;
+    } catch (err) {
+      console.error("PDF generation failed:", err);
+      throw new Error("PDF generation failed");
+    }
   }
 
   async getByClient(clientId: string) {
