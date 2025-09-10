@@ -38,7 +38,7 @@
                   "
                 >
                   <img
-                    src="https://www.npmjs.com/npm-avatar/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdmF0YXJVUkwiOiJodHRwczovL3MuZ3JhdmF0YXIuY29tL2F2YXRhci8wOWViNjRmZWY0YzMyZWExZDc5ZTIyN2UwNzczMGU2Zj9zaXplPTQ5NiZkZWZhdWx0PXJldHJvIn0.oxi7jn8w8CyxG9UHr3N2XKmdqmZyAYVrSKsFmL66gck"
+                    src="data:image/png;base64,{{provider.logo}}"
                     alt="Logo"
                     style="height: 64px; width: auto"
                   />
@@ -137,6 +137,7 @@
         >
           <div
             style="
+              height: 100%; /* set a fixed height */
               border: 1px solid #d1d5db;
               border-radius: 8px;
               overflow: hidden;
@@ -159,7 +160,7 @@
               style="
                 padding: 12px;
                 display: grid;
-                grid-template-columns: 160px 1fr;
+                grid-template-columns: 30% 70%;
                 gap: 6px 14px;
                 font-size: 10px;
                 line-height: 1.45;
@@ -190,6 +191,7 @@
         >
           <div
             style="
+              height: 100%;
               border: 1px solid #d1d5db;
               border-radius: 8px;
               overflow: hidden;
@@ -212,7 +214,7 @@
               style="
                 padding: 12px;
                 display: grid;
-                grid-template-columns: 160px 1fr;
+                grid-template-columns: 30% 70%;
                 gap: 6px 14px;
                 font-size: 10px;
                 line-height: 1.45;
@@ -348,6 +350,7 @@
         style="
           display: table;
           width: 100%;
+          height: 100%;
           table-layout: fixed;
           margin-top: 12px;
         "
@@ -359,6 +362,7 @@
             vertical-align: top;
             width: 50%;
             padding-right: 1mm !important;
+            height: 100%;
           "
         >
           <div
@@ -385,7 +389,7 @@
               style="
                 padding: 12px;
                 display: grid;
-                grid-template-columns: 160px 1fr;
+                grid-template-columns: 20% 80%;
                 gap: 6px 14px;
                 font-size: 10px;
               "
@@ -412,6 +416,7 @@
             display: table-cell;
             vertical-align: top;
             width: 50%;
+            height: 100%;
             padding-left: 1mm !important;
           "
         >
@@ -510,33 +515,6 @@
                   </div>
                 </div>
               </div>
-              <div style="border-top: 1px solid #d1d5db; margin: 10px 0"></div>
-              <div style="display: table; width: 100%; table-layout: fixed">
-                <div style="display: table-row; color: #1396e2">
-                  <div
-                    style="
-                      display: table-cell;
-                      padding: 4px 0;
-                      font-size: 16px;
-                      font-weight: 800;
-                    "
-                  >
-                    Grand Total
-                  </div>
-                  <div
-                    style="
-                      display: table-cell;
-                      padding: 4px 0;
-                      font-size: 16px;
-                      font-weight: 800;
-                      text-align: right;
-                      font-family: Consolas, Menlo, Monaco, monospace;
-                    "
-                  >
-                    ₹ {{totals.grand}}
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -562,11 +540,35 @@
             font-size: 12px;
           "
         >
-          Amount in Words
+          <div
+            style="
+              display: table-cell;
+              padding: 4px 0;
+              font-size: 16px;
+              font-weight: 800;
+            "
+          >
+            Billing Total Amount
+          </div>
         </div>
         <div style="padding: 12px; font-size: 10px">
-          <span style="font-weight: 200; color: #374151">Amt in Words :</span>
-          <span>{{totals.inWords}}</span>
+          <div style="display: table-row; color: #1396e2">
+            <div
+              style="
+                display: table-cell;
+                padding: 4px 0;
+                font-size: 16px;
+                font-weight: 800;
+                text-align: right;
+                font-family: Consolas, Menlo, Monaco, monospace;
+              "
+            >
+              ₹ {{totals.grand}}
+            </div>
+          </div>
+          <span style="font-weight: 200; color: #374151"
+            >({{totals.inWords}})</span
+          >
         </div>
       </div>
 
