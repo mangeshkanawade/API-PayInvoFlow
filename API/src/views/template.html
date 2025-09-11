@@ -2,6 +2,17 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap"
+      rel="stylesheet"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TAX INVOICE - {{provider.name}}</title>
   </head>
   <body
@@ -19,7 +30,7 @@
       <div
         style="
           width: 100%;
-          border-bottom: 4px solid #1396e2;
+          border-bottom: 4px solid #1a3b5d;
           padding-bottom: 12px;
           margin-bottom: 12px;
         "
@@ -27,31 +38,38 @@
         <table style="width: 100%; border-collapse: collapse">
           <tr>
             <!-- Left: Logo + Provider Info -->
-            <td style="vertical-align: top; width: 60%">
-              <div style="margin-bottom: 12px">
+            <td style="width: 60%; vertical-align: middle; height: 100%">
+              <div
+                style="
+                  display: flex;
+                  align-items: center; /* centers content vertically */
+                  justify-content: flex-start; /* space between items if needed */
+                  gap: 12px; /* spacing between logo and info */
+                  height: 100%; /* makes it fill the td height */
+                "
+              >
                 <!-- Logo -->
-                <div
-                  style="
-                    display: inline-block;
-                    vertical-align: top;
-                    margin-right: 12px;
-                  "
-                >
-                  <img
-                    src="data:image/png;base64,{{provider.logo}}"
-                    alt="Logo"
-                    style="height: 64px; width: auto"
-                  />
-                </div>
+                <img
+                  src="data:image/png;base64,{{provider.logo}}"
+                  alt="Logo"
+                  style="height: 64px; width: auto"
+                />
 
                 <!-- Provider Info -->
-                <div style="display: inline-block; vertical-align: top">
+                <div
+                  style="
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                  "
+                >
                   <h1
                     style="
-                      margin: 0 0 4px 0;
-                      font-size: 18px;
-                      font-weight: 200;
-                      color: #1f2937;
+                      font-size: 14px;
+                      font-weight: 800;
+                      color: #1a3b5d;
+                      text-transform: uppercase;
+                      margin: 0;
                     "
                   >
                     {{provider.name}}
@@ -74,7 +92,7 @@
                 style="
                   font-size: 22px;
                   font-weight: 800;
-                  color: #1396e2;
+                  color: #1a3b5d;
                   letter-spacing: 0.02em;
                   text-transform: uppercase;
                 "
@@ -117,126 +135,112 @@
         </table>
       </div>
 
-      <!-- Parties row (table layout: two cells) -->
+      <!-- Parties row using CSS Grid for equal height -->
       <div
         style="
-          display: table;
-          width: 100%;
-          table-layout: fixed;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 8px;
           margin-top: 14px;
         "
       >
-        <!-- Receiver cell -->
+        <!-- Receiver -->
         <div
           style="
-            display: table-cell;
-            vertical-align: top;
-            width: 50%;
-            padding-right: 1mm !important;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
           "
         >
           <div
             style="
-              height: 100%; /* set a fixed height */
-              border: 1px solid #d1d5db;
-              border-radius: 8px;
-              overflow: hidden;
-              box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+              background: #f7fafc;
+              border-bottom: 1px solid #d1d5db;
+              padding: 10px 12px;
+              color: #1a3b5d;
+              font-weight: 200;
+              font-size: 12px;
             "
           >
-            <div
-              style="
-                background: #f7fafc;
-                border-bottom: 1px solid #d1d5db;
-                padding: 10px 12px;
-                color: #1396e2;
-                font-weight: 200;
-                font-size: 12px;
-              "
-            >
-              Details Of Receiver
+            Details Of Receiver
+          </div>
+          <div
+            style="
+              padding: 12px;
+              display: grid;
+              grid-template-columns: 30% 70%;
+              gap: 6px 14px;
+              font-size: 10px;
+              line-height: 1.45;
+              flex: 1;
+            "
+          >
+            <div style="font-weight: 600; color: #374151">Name</div>
+            <div>{{receiver.name}}</div>
+            <div style="font-weight: 600; color: #374151">GSTIN</div>
+            <div style="font-family: Consolas, Menlo, Monaco, monospace">
+              {{receiver.gstin}}
             </div>
-            <div
-              style="
-                padding: 12px;
-                display: grid;
-                grid-template-columns: 30% 70%;
-                gap: 6px 14px;
-                font-size: 10px;
-                line-height: 1.45;
-              "
-            >
-              <div style="font-weight: 600; color: #374151">Name</div>
-              <div>{{receiver.name}}</div>
-              <div style="font-weight: 600; color: #374151">GSTIN</div>
-              <div style="font-family: Consolas, Menlo, Monaco, monospace">
-                {{receiver.gstin}}
-              </div>
-              <div style="font-weight: 600; color: #374151">Address</div>
-              <div>{{receiver.address}}</div>
-              <div style="font-weight: 600; color: #374151">State</div>
-              <div>{{receiver.state}}</div>
-            </div>
+            <div style="font-weight: 600; color: #374151">Address</div>
+            <div>{{receiver.address}}</div>
+            <div style="font-weight: 600; color: #374151">State</div>
+            <div>{{receiver.state}}</div>
           </div>
         </div>
 
-        <!-- Provider cell -->
+        <!-- Provider -->
         <div
           style="
-            display: table-cell;
-            vertical-align: top;
-            width: 50%;
-            padding-left: 1mm !important;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
           "
         >
           <div
             style="
-              height: 100%;
-              border: 1px solid #d1d5db;
-              border-radius: 8px;
-              overflow: hidden;
-              box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+              background: #f7fafc;
+              border-bottom: 1px solid #d1d5db;
+              padding: 10px 12px;
+              color: #1a3b5d;
+              font-weight: 200;
+              font-size: 12px;
             "
           >
-            <div
-              style="
-                background: #f7fafc;
-                border-bottom: 1px solid #d1d5db;
-                padding: 10px 12px;
-                color: #1396e2;
-                font-weight: 200;
-                font-size: 12px;
-              "
-            >
-              Details Of Service Provider
+            Details Of Service Provider
+          </div>
+          <div
+            style="
+              padding: 12px;
+              display: grid;
+              grid-template-columns: 30% 70%;
+              gap: 6px 14px;
+              font-size: 10px;
+              line-height: 1.45;
+              flex: 1;
+            "
+          >
+            <div style="font-weight: 600; color: #374151">Name</div>
+            <div>{{provider.name}}</div>
+            <div style="font-weight: 600; color: #374151">GSTIN</div>
+            <div style="font-family: Consolas, Menlo, Monaco, monospace">
+              {{provider.gstin}}
             </div>
-            <div
-              style="
-                padding: 12px;
-                display: grid;
-                grid-template-columns: 30% 70%;
-                gap: 6px 14px;
-                font-size: 10px;
-                line-height: 1.45;
-              "
-            >
-              <div style="font-weight: 600; color: #374151">Name</div>
-              <div>{{provider.name}}</div>
-              <div style="font-weight: 600; color: #374151">GSTIN</div>
-              <div style="font-family: Consolas, Menlo, Monaco, monospace">
-                {{provider.gstin}}
-              </div>
-              <div style="font-weight: 600; color: #374151">Address</div>
-              <div>{{provider.address}}</div>
-              <div style="font-weight: 600; color: #374151">State</div>
-              <div>{{provider.state}}</div>
-            </div>
+            <div style="font-weight: 600; color: #374151">Address</div>
+            <div>{{provider.address}}</div>
+            <div style="font-weight: 600; color: #374151">State</div>
+            <div>{{provider.state}}</div>
           </div>
         </div>
       </div>
 
       <!-- HR divider similar to top -->
-      <div style="border-bottom: 4px solid #1396e2; margin-top: 14px"></div>
+      <div style="border-bottom: 4px solid #1a3b5d; margin-top: 14px"></div>
 
       <!-- Ledger -->
       <div
@@ -281,7 +285,7 @@
                   padding: 8px;
                   font-size: 10px;
                   font-weight: 600;
-                  width: 160px;
+                  width: 100px;
                 "
               >
                 Vehicle No.
@@ -302,7 +306,7 @@
                   padding: 8px;
                   font-size: 10px;
                   font-weight: 600;
-                  width: 130px;
+                  width: 100px;
                 "
               >
                 Amount (Rs.)
@@ -337,7 +341,11 @@
                   font-family: Consolas, Menlo, Monaco, monospace;
                 "
               >
-                &#8377; {{this.amount}}
+                <i
+                  class="fa-solid fa-indian-rupee-sign"
+                  style="margin-right: 2px"
+                ></i>
+                {{this.amount}}
               </td>
             </tr>
             {{/each}}
@@ -381,7 +389,7 @@
                 background: #f7fafc;
                 border-bottom: 1px solid #d1d5db;
                 padding: 10px 12px;
-                color: #1396e2;
+                color: #1a3b5d;
                 font-weight: 200;
                 font-size: 12px;
               "
@@ -445,7 +453,7 @@
                 background: #f7fafc;
                 border-bottom: 1px solid #d1d5db;
                 padding: 10px 12px;
-                color: #1396e2;
+                color: #1a3b5d;
                 font-weight: 200;
                 font-size: 12px;
               "
@@ -485,7 +493,11 @@
                       font-family: Consolas, Menlo, Monaco, monospace;
                     "
                   >
-                    &#8377; {{totals.subtotal}}
+                    <i
+                      class="fa-solid fa-indian-rupee-sign"
+                      style="margin-right: 2px"
+                    ></i>
+                    {{totals.subtotal}}
                   </div>
                 </div>
 
@@ -510,7 +522,11 @@
                       font-family: Consolas, Menlo, Monaco, monospace;
                     "
                   >
-                    &#8377; {{totals.cgst}}
+                    <i
+                      class="fa-solid fa-indian-rupee-sign"
+                      style="margin-right: 2px"
+                    ></i>
+                    {{totals.cgst}}
                   </div>
                 </div>
 
@@ -535,7 +551,11 @@
                       font-family: Consolas, Menlo, Monaco, monospace;
                     "
                   >
-                    &#8377; {{totals.sgst}}
+                    <i
+                      class="fa-solid fa-indian-rupee-sign"
+                      style="margin-right: 2px"
+                    ></i>
+                    {{totals.sgst}}
                   </div>
                 </div>
               </div>
@@ -559,7 +579,7 @@
             background: #f7fafc;
             border-bottom: 1px solid #d1d5db;
             padding: 10px 12px;
-            color: #1396e2;
+            color: #1a3b5d;
             font-weight: 200;
             font-size: 12px;
           "
@@ -576,7 +596,7 @@
           </div>
         </div>
         <div style="padding: 12px; font-size: 10px">
-          <div style="display: table-row; color: #1396e2">
+          <div style="display: table-row; color: #1a3b5d">
             <div
               style="
                 display: table-cell;
@@ -587,12 +607,16 @@
                 font-family: Consolas, Menlo, Monaco, monospace;
               "
             >
-              &#8377; {{totals.grand}}
+              <i
+                class="fa-solid fa-indian-rupee-sign"
+                style="margin-right: 2px"
+              ></i>
+              {{totals.grand}}
             </div>
           </div>
-          <span style="font-weight: 200; color: #374151"
-            >({{totals.inWords}})</span
-          >
+          <span style="font-weight: 200; color: #374151; margin-top: 5px"
+            >({{totals.inWords}})
+          </span>
         </div>
       </div>
 
@@ -651,6 +675,36 @@
             "
           >
             For, {{provider.name}}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Invoice main content ends here -->
+    <!-- Business Info / Marketing Footer -->
+    <div
+      style="text-align: center; font-size: 6px; color: #444; padding: 20px 0"
+    >
+      <div
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+        "
+      >
+        <img
+          src="data:image/png;base64,{{business.logo}}"
+          alt="PayInvoFlow Logo"
+          style="height: 20px; width: auto"
+        />
+
+        <div style="text-align: left">
+          <div style="font-weight: bold; color: #222">
+            Generated by {{business.name}}
+          </div>
+          <div style="color: #555">
+            {{business.email}} | {{business.contact}}
           </div>
         </div>
       </div>

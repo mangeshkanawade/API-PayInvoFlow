@@ -39,6 +39,7 @@ export async function pdfGenerator(data: any): Promise<Buffer> {
       : await puppeteer.launch({ channel: "chrome", headless: true });
 
     const page = await browser.newPage();
+
     // 4. Set HTML content
     await page.setContent(html, { waitUntil: "load" });
 
@@ -47,6 +48,7 @@ export async function pdfGenerator(data: any): Promise<Buffer> {
       await page.pdf({
         format: "A4",
         printBackground: true,
+        margin: { top: "10mm", bottom: "10mm" },
       })
     );
 
