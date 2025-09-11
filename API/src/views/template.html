@@ -337,7 +337,7 @@
                   font-family: Consolas, Menlo, Monaco, monospace;
                 "
               >
-                ₹ {{this.amount}}
+                &#8377; {{this.amount}}
               </td>
             </tr>
             {{/each}}
@@ -350,7 +350,6 @@
         style="
           display: table;
           width: 100%;
-          height: 100%;
           table-layout: fixed;
           margin-top: 12px;
         "
@@ -362,11 +361,15 @@
             vertical-align: top;
             width: 50%;
             padding-right: 1mm !important;
-            height: 100%;
+            height: 150px; /* fixed height */
           "
         >
           <div
             style="
+              height: 100%; /* fill parent cell */
+              box-sizing: border-box; /* include padding in height */
+              display: flex;
+              flex-direction: column; /* header + body layout */
               border: 1px solid #d1d5db;
               border-radius: 8px;
               overflow: hidden;
@@ -385,6 +388,8 @@
             >
               Bank Details
             </div>
+
+            <!-- content area fills remaining space -->
             <div
               style="
                 padding: 12px;
@@ -392,6 +397,9 @@
                 grid-template-columns: 20% 80%;
                 gap: 6px 14px;
                 font-size: 10px;
+                line-height: 1.2;
+                flex: 1; /* <-- makes this grow to match height */
+                overflow: hidden; /* hide overflow or use auto if you want scroll */
               "
             >
               <div style="font-weight: 600">Bank Name</div>
@@ -416,12 +424,16 @@
             display: table-cell;
             vertical-align: top;
             width: 50%;
-            height: 100%;
+            height: 150px; /* same fixed height */
             padding-left: 1mm !important;
           "
         >
           <div
             style="
+              height: 100%; /* fill parent cell */
+              box-sizing: border-box;
+              display: flex;
+              flex-direction: column;
               border: 1px solid #d1d5db;
               border-radius: 8px;
               overflow: hidden;
@@ -440,7 +452,17 @@
             >
               Total
             </div>
-            <div style="padding: 12px">
+
+            <div
+              style="
+                padding: 12px;
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                box-sizing: border-box;
+                overflow: hidden;
+              "
+            >
               <div style="display: table; width: 100%; table-layout: fixed">
                 <div style="display: table-row">
                   <div
@@ -448,7 +470,7 @@
                       display: table-cell;
                       padding: 4px 0;
                       font-size: 10px;
-                      font-weight: 200;
+                      font-weight: 600;
                       color: #374151;
                     "
                   >
@@ -463,16 +485,17 @@
                       font-family: Consolas, Menlo, Monaco, monospace;
                     "
                   >
-                    ₹ {{totals.subtotal}}
+                    &#8377; {{totals.subtotal}}
                   </div>
                 </div>
+
                 <div style="display: table-row">
                   <div
                     style="
                       display: table-cell;
                       padding: 4px 0;
                       font-size: 10px;
-                      font-weight: 200;
+                      font-weight: 600;
                       color: #374151;
                     "
                   >
@@ -487,16 +510,17 @@
                       font-family: Consolas, Menlo, Monaco, monospace;
                     "
                   >
-                    ₹ {{totals.cgst}}
+                    &#8377; {{totals.cgst}}
                   </div>
                 </div>
+
                 <div style="display: table-row">
                   <div
                     style="
                       display: table-cell;
                       padding: 4px 0;
                       font-size: 10px;
-                      font-weight: 200;
+                      font-weight: 600;
                       color: #374151;
                     "
                   >
@@ -511,7 +535,7 @@
                       font-family: Consolas, Menlo, Monaco, monospace;
                     "
                   >
-                    ₹ {{totals.sgst}}
+                    &#8377; {{totals.sgst}}
                   </div>
                 </div>
               </div>
@@ -563,7 +587,7 @@
                 font-family: Consolas, Menlo, Monaco, monospace;
               "
             >
-              ₹ {{totals.grand}}
+              &#8377; {{totals.grand}}
             </div>
           </div>
           <span style="font-weight: 200; color: #374151"
