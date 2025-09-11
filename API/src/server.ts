@@ -21,11 +21,11 @@ app.get("/", (_, res) => {
   res.send(`Running in ${ENV.NODE_ENV} mode 🚀`);
 });
 
-app.use("/api", routes);
-
 // Swagger docs
 const PORT = ENV.PORT;
 swaggerDocs(app, Number(ENV.PORT));
+
+app.use("/api", routes);
 
 // Global Error Handler (must be after routes)
 app.use(errorHandler);
