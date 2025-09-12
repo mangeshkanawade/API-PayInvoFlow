@@ -11,10 +11,10 @@ const router = Router();
 
 // Alphabetical order
 router.use("/auth", authRoutes);
-router.use("/users", userRoutes);
+router.use("/users", authMiddleware, userRoutes);
 router.use("/company", authMiddleware, companyRoutes);
 router.use("/clients", authMiddleware, clientRoutes);
-router.use("/invoices", invoiceRoutes);
+router.use("/invoices", authMiddleware, invoiceRoutes);
 router.use("/invoice-items", authMiddleware, invoiceItemRoutes);
 
 export default router;

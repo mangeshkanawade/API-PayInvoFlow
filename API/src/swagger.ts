@@ -13,8 +13,8 @@ const options: swaggerJsdoc.Options = {
     },
     servers: [
       {
-        url: `http://localhost:${ENV.PORT}/api`,
-        description: "Local development server",
+        url: `/api`,
+        description: "PayInvoFlow API",
       },
     ],
     components: {
@@ -30,7 +30,11 @@ const options: swaggerJsdoc.Options = {
     },
     security: [{ bearerAuth: [] }],
   },
-  apis: ["./src/routes/**/*.ts"],
+  apis: [
+    "./src/routes/**/*.ts",
+    "./dist/routes/**/*.js",
+    "./src/routes/**/*.js",
+  ],
 };
 
 const swaggerSpec = swaggerJsdoc(options);
@@ -78,8 +82,13 @@ export function swaggerDocs(app: Express, port: number) {
     swaggerUi.serve,
     swaggerUi.setup(swaggerSpec, {
       swaggerOptions: swaggerOptions,
+      customCssUrl: "https://unpkg.com/swagger-ui-dist/swagger-ui.css",
+      customJs: [
+        "https://unpkg.com/swagger-ui-dist/swagger-ui-bundle.js",
+        "https://unpkg.com/swagger-ui-dist/swagger-ui-standalone-preset.js",
+      ],
     })
   );
 
-  console.log(`📖 Swagger docs available at http://localhost:${port}/api-docs`);
+  console.log(`📖 Swagger docs available at ${ENV.DOMAIN}/api-docs`);
 }

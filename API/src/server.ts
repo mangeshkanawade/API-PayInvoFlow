@@ -10,26 +10,53 @@ import { swaggerDocs } from "./swagger";
 dotenv.config();
 
 const app = express();
-app.use(cors());
+
+// ✅ Step 1: Allowed origins
+const allowedOrigins = [
+  "http://localhost:2000",
+  "http://localhost:3000",
+  "https://api-payinvoflow.vercel.app",
+];
+
+const serverUrl =
+  ENV.NODE_ENV === "production"
+    ? `${ENV.DOMAIN}/api` // use your domain in production
+    : `http://localhost:${ENV.PORT}/api`;
+
+// ✅ Step 2: CORS middleware
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 
-// DB connection
+// ✅ Step 3: DB connection
 connectDB(process.env.MONGO_URI || "mongodb://127.0.0.1:27017/payinvflow");
 
-// Routes
+// ✅ Step 4: Health route
 app.get("/", (_, res) => {
   res.send(`Running in ${ENV.NODE_ENV} mode 🚀`);
 });
 
-// Swagger docs
-const PORT = ENV.PORT;
+// ✅ Step 5: Swagger docs
 swaggerDocs(app, Number(ENV.PORT));
 
+// ✅ Step 6: API routes
 app.use("/api", routes);
 
-// Global Error Handler (must be after routes)
+// ✅ Step 7: Error handler (last)
 app.use(errorHandler);
 
+// ✅ Step 8: Start server
 app.listen(ENV.PORT, () =>
-  console.log(`🚀 PayInvoFlow API running on http://localhost:${ENV.PORT}`)
+  console.log(`🚀 PayInvoFlow API running at ${serverUrl}`)
 );
