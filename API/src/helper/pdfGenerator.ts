@@ -10,7 +10,10 @@ import { ENV } from "../config/env";
 export async function pdfGenerator(data: any): Promise<Buffer> {
   try {
     // 1. Load HTML template
-    const templatePath = path.join(__dirname, "../public/views/template.html");
+    const templatePath = path.join(
+      __dirname,
+      "../../public/views/template.html"
+    );
     const htmlTemplate = await fs.promises.readFile(templatePath, "utf-8");
 
     // 2. Compile template with Handlebars

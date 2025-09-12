@@ -15,6 +15,10 @@ export class UserService extends BaseService<IUser> {
     this.jwtSecret = jwtSecret;
   }
 
+  async delete(): Promise<never> {
+    throw new Error("Delete operation is not allowed on users.");
+  }
+
   async register(userData: Partial<IUser>) {
     const hashedPassword = await bcrypt.hash(userData.password!, 10);
     const user = await this.repo.create({

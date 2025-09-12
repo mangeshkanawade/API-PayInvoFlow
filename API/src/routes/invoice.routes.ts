@@ -268,4 +268,18 @@ router.get("/client/:clientId", controller.getByClient);
  */
 router.get("/company/:companyId", controller.getByCompany);
 
+// Temp Need to removelater
+
+/**
+ * @openapi
+ * /pdf:
+ *   get:
+ *     summary: Export invoice as PDF
+ *     tags: [PDF]
+ *     responses:
+ *       200:
+ *         description: PDF generated successfully
+ */
+router.get("/pdf", controller.exportPdfFile);
+
 export default router;

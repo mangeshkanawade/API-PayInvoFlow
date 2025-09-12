@@ -5,13 +5,8 @@ export interface IInvoice extends Document {
   invoiceDate: Date;
   client: mongoose.Types.ObjectId;
   company: mongoose.Types.ObjectId;
-  subtotal: number;
   cgstRate?: number;
   sgstRate?: number;
-  cgstAmount: number;
-  sgstAmount: number;
-  grandTotal: number;
-  amountInWords: string;
   status: "Draft" | "Paid" | "Cancelled";
 }
 
@@ -21,13 +16,8 @@ const InvoiceSchema = new Schema<IInvoice>(
     invoiceDate: { type: Date, required: true },
     client: { type: Schema.Types.ObjectId, ref: "Client", required: true },
     company: { type: Schema.Types.ObjectId, ref: "Company", required: true },
-    subtotal: { type: Number, required: true },
     cgstRate: { type: Number, default: 6.0 },
     sgstRate: { type: Number, default: 6.0 },
-    cgstAmount: { type: Number, required: true },
-    sgstAmount: { type: Number, required: true },
-    grandTotal: { type: Number, required: true },
-    amountInWords: { type: String, required: true },
     status: { type: String, default: "Draft" },
   },
   { timestamps: true }

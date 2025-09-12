@@ -13,7 +13,7 @@
     />
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TAX INVOICE - {{provider.name}}</title>
+    <title>TAX INVOICE - {{company.name}}</title>
   </head>
   <body
     style="
@@ -50,7 +50,7 @@
               >
                 <!-- Logo -->
                 <img
-                  src="data:image/png;base64,{{provider.logo}}"
+                  src="data:image/png;base64,{{company.logo}}"
                   alt="Logo"
                   style="height: 64px; width: auto"
                 />
@@ -72,14 +72,14 @@
                       margin: 0;
                     "
                   >
-                    {{provider.name}}
+                    {{company.name}}
                   </h1>
                   <div style="font-size: 10px; line-height: 1.4">
                     <span style="font-weight: 600">GSTIN:</span>
                     <span
                       style="font-family: Consolas, Menlo, Monaco, monospace"
                     >
-                      {{provider.gstin}}
+                      {{company.gstin}}
                     </span>
                   </div>
                 </div>
@@ -179,15 +179,15 @@
             "
           >
             <div style="font-weight: 600; color: #374151">Name</div>
-            <div>{{receiver.name}}</div>
+            <div>{{client.name}}</div>
             <div style="font-weight: 600; color: #374151">GSTIN</div>
             <div style="font-family: Consolas, Menlo, Monaco, monospace">
-              {{receiver.gstin}}
+              {{client.gstin}}
             </div>
             <div style="font-weight: 600; color: #374151">Address</div>
-            <div>{{receiver.address}}</div>
+            <div>{{client.address}}</div>
             <div style="font-weight: 600; color: #374151">State</div>
-            <div>{{receiver.state}}</div>
+            <div>{{client.state}}</div>
           </div>
         </div>
 
@@ -226,15 +226,15 @@
             "
           >
             <div style="font-weight: 600; color: #374151">Name</div>
-            <div>{{provider.name}}</div>
+            <div>{{company.name}}</div>
             <div style="font-weight: 600; color: #374151">GSTIN</div>
             <div style="font-family: Consolas, Menlo, Monaco, monospace">
-              {{provider.gstin}}
+              {{company.gstin}}
             </div>
             <div style="font-weight: 600; color: #374151">Address</div>
-            <div>{{provider.address}}</div>
+            <div>{{company.address}}</div>
             <div style="font-weight: 600; color: #374151">State</div>
-            <div>{{provider.state}}</div>
+            <div>{{company.state}}</div>
           </div>
         </div>
       </div>
@@ -314,7 +314,7 @@
             </tr>
           </thead>
           <tbody>
-            {{#each items}}
+            {{#each invoiceItems}}
             <tr style="border-bottom: 1px solid #e5e7eb; font-size: 10px">
               <td style="padding: 6px 8px; text-align: center">{{this.sr}}</td>
               <td
@@ -331,7 +331,7 @@
                   font-family: Consolas, Menlo, Monaco, monospace;
                 "
               >
-                {{this.vehicle}}
+                {{this.vehicleNo}}
               </td>
               <td style="padding: 6px 8px">{{this.particulars}}</td>
               <td
@@ -411,16 +411,16 @@
               "
             >
               <div style="font-weight: 600">Bank Name</div>
-              <div>{{bank.name}}</div>
+              <div>{{company.name}}</div>
               <div style="font-weight: 600">Branch</div>
-              <div>{{bank.branch}}</div>
+              <div>{{company.branch}}</div>
               <div style="font-weight: 600">Ac No</div>
               <div style="font-family: Consolas, Menlo, Monaco, monospace">
-                {{bank.account}}
+                {{company.account}}
               </div>
               <div style="font-weight: 600">IFSC</div>
               <div style="font-family: Consolas, Menlo, Monaco, monospace">
-                {{bank.ifsc}}
+                {{company.ifsc}}
               </div>
             </div>
           </div>
@@ -511,7 +511,7 @@
                       color: #374151;
                     "
                   >
-                    CGST 6%
+                    CGST {{totals.cgstRate}}%
                   </div>
                   <div
                     style="
@@ -526,7 +526,7 @@
                       class="fa-solid fa-indian-rupee-sign"
                       style="margin-right: 2px"
                     ></i>
-                    {{totals.cgst}}
+                    {{totals.cgstAmount}}
                   </div>
                 </div>
 
@@ -540,7 +540,7 @@
                       color: #374151;
                     "
                   >
-                    SGST 6%
+                    SGST {{totals.sgstRate}}%
                   </div>
                   <div
                     style="
@@ -674,7 +674,7 @@
               line-height: 68px; /* ✅ centers vertically */
             "
           >
-            For, {{provider.name}}
+            For, {{company.name}}
           </div>
         </div>
       </div>
