@@ -21,7 +21,7 @@ const router = Router();
  *             properties:
  *               email:
  *                 type: string
- *                 example: test@example.com
+ *                 example: payinvoflow@gmail.com
  *               password:
  *                 type: string
  *                 example: Pass@123
@@ -30,6 +30,48 @@ const router = Router();
  *         description: JWT token and user info
  */
 router.post("/login", UserController.login);
+
+/**
+ * @openapi
+ * /auth/register:
+ *   post:
+ *     summary: Register a new user
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - username
+ *               - email
+ *               - password
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 example: testuser
+ *               name:
+ *                 type: string
+ *                 example: user
+ *               phone:
+ *                 type: string
+ *                 example: 7894561230
+ *               email:
+ *                 type: string
+ *                 example: payinvoflow@gmail.com
+ *               password:
+ *                 type: string
+ *                 example: Pass@123
+ *               role:
+ *                 type: string
+ *                 enum: [Admin, Biller, Viewer]
+ *                 example: Viewer
+ *     responses:
+ *       201:
+ *         description: User registered successfully
+ */
+router.post("/register", UserController.register);
 
 /**
  * @openapi
@@ -48,7 +90,7 @@ router.post("/login", UserController.login);
  *             properties:
  *               email:
  *                 type: string
- *                 example: test@example.com
+ *                 example: payinvoflow@gmail.com
  *     responses:
  *       200:
  *         description: Reset token sent to email
@@ -85,5 +127,30 @@ router.post("/forgot-password", UserController.forgotPassword);
  *         description: Invalid or expired token
  */
 router.post("/reset-password", UserController.resetPassword);
+
+/**
+ * @openapi
+ * /auth/refresh-token:
+ *   post:
+ *     summary: Get new access token using refresh token
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - refreshToken
+ *             properties:
+ *               refreshToken:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: New access token
+ *       401:
+ *         description: Invalid refresh token
+ */
+router.post("/refresh-token", UserController.refreshToken);
 
 export default router;

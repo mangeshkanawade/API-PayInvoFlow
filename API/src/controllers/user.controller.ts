@@ -1,11 +1,12 @@
 import { plainToInstance } from "class-transformer";
 import { Request, Response } from "express";
+import { ENV } from "../config/env";
 import { UserDTO } from "../dtos/userDTO";
 import { UserRepository } from "../repositories/user.repository";
 import { UserService } from "../services/user.service";
 
 const repo = new UserRepository();
-const service = new UserService(repo, process.env.JWT_SECRET || "supersecret");
+const service = new UserService(repo, ENV.JWT_SECRET || "supersecret");
 
 export const UserController = {
   register: async (req: Request, res: Response) => {
@@ -101,6 +102,16 @@ export const UserController = {
       res.json({ message: "Password reset successful" });
     } catch (err: any) {
       res.status(400).json({ message: err.message });
+    }
+  },
+
+  refreshToken: async (req: Request, res: Response) => {
+    try {
+      const { refreshToken } = req.body;
+      const { token } = await service.refreshAccessToken(refreshToken);
+      res.json({ token });
+    } catch (err: any) {
+      res.status(401).json({ message: err.message });
     }
   },
 };

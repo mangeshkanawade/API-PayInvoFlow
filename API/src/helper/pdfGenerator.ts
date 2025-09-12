@@ -5,11 +5,12 @@ import chromium from "@sparticuz/chromium";
 import Handlebars from "handlebars";
 import puppeteer from "puppeteer";
 import puppeteerCore, { LaunchOptions } from "puppeteer-core";
+import { ENV } from "../config/env";
 
 export async function pdfGenerator(data: any): Promise<Buffer> {
   try {
     // 1. Load HTML template
-    const templatePath = path.join(__dirname, "../views/template.html");
+    const templatePath = path.join(__dirname, "../public/views/template.html");
     const htmlTemplate = await fs.promises.readFile(templatePath, "utf-8");
 
     // 2. Compile template with Handlebars
@@ -19,9 +20,7 @@ export async function pdfGenerator(data: any): Promise<Buffer> {
     });
 
     // 3. launch
-    const isProd =
-      process.env.VERCEL_ENV === "production" ||
-      process.env.NODE_ENV === "production";
+    const isProd = ENV.NODE_ENV === "production";
     const browser = isProd
       ? await puppeteerCore.launch({
           args: [...chromium.args, "--disable-gpu", "--no-sandbox"],

@@ -31,13 +31,19 @@ export class UserService extends BaseService<IUser> {
     const isValid = await bcrypt.compare(password, user.password);
     if (!isValid) throw new Error("Invalid email or password");
 
-    // generate JWT
+    // generate access token
     const token = jwt.sign({ id: user._id, role: user.role }, this.jwtSecret, {
       expiresIn: "1h",
     });
 
+    // generate refresh token
+    const refreshToken = crypto.randomBytes(40).toString("hex");
+    user.refreshToken = refreshToken;
+    await user.save();
+
     return {
       token,
+      refreshToken,
       user: {
         id: user?._id?.toString(),
         username: user.username,
@@ -45,6 +51,17 @@ export class UserService extends BaseService<IUser> {
         role: user.role,
       },
     };
+  }
+
+  async refreshAccessToken(refreshToken: string): Promise<{ token: string }> {
+    const user = await UserModel.findOne({ refreshToken });
+    if (!user) throw new Error("Invalid refresh token");
+
+    // Optionally, you can check for token expiry or rotation here
+    const token = jwt.sign({ id: user._id, role: user.role }, this.jwtSecret, {
+      expiresIn: "1h",
+    });
+    return { token };
   }
 
   async getByUserEmail(email: string) {
@@ -78,7 +95,7 @@ export class UserService extends BaseService<IUser> {
       resetPasswordToken: token,
       resetPasswordExpires: { $gt: new Date() },
     });
-    if (!user) throw new Error("Invalid or expired token");
+    if (!user) throw new Error("Invalid or expired reset password token");
 
     user.password = await bcrypt.hash(newPassword, 10);
     user.resetPasswordToken = undefined;

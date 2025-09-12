@@ -56,11 +56,14 @@ export class InvoiceService extends BaseService<IInvoice> {
   }
 
   async buildInvoiceData() {
-    const logoPath = path.join(__dirname, "../images/logo.png");
+    const logoPath = path.join(__dirname, "../../public/images/logo.png");
     const logoBuffer = await fs.promises.readFile(logoPath);
     const logoBase64 = logoBuffer.toString("base64");
 
-    const businessLogoPath = path.join(__dirname, "../images/payinvoflow.png");
+    const businessLogoPath = path.join(
+      __dirname,
+      "../../public/images/payinvoflow.png"
+    );
     const businessLogoBuffer = await fs.promises.readFile(businessLogoPath);
     const businessLogoBase64 = businessLogoBuffer.toString("base64");
 

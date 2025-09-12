@@ -9,6 +9,7 @@ export interface IUser extends Document {
   role: "Admin" | "Company" | "Viewer";
   resetPasswordToken?: string;
   resetPasswordExpires?: Date;
+  refreshToken?: string;
 }
 
 const UserSchema = new Schema<IUser>(
@@ -25,6 +26,7 @@ const UserSchema = new Schema<IUser>(
     },
     resetPasswordToken: { type: String },
     resetPasswordExpires: { type: Date },
+    refreshToken: { type: String },
   },
   { timestamps: true }
 );

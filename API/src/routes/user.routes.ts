@@ -33,48 +33,6 @@ const router = Router();
  */
 
 /**
- * @openapi
- * /users/register:
- *   post:
- *     summary: Register a new user
- *     tags: [Users]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - username
- *               - email
- *               - password
- *             properties:
- *               username:
- *                 type: string
- *                 example: testuser
- *               name:
- *                 type: string
- *                 example: user
- *               phone:
- *                 type: string
- *                 example: 7894561230
- *               email:
- *                 type: string
- *                 example: test@example.com
- *               password:
- *                 type: string
- *                 example: Pass@123
- *               role:
- *                 type: string
- *                 enum: [Admin, Biller, Viewer]
- *                 example: Viewer
- *     responses:
- *       201:
- *         description: User registered successfully
- */
-router.post("/register", UserController.register);
-
-/**
  * @swagger
  * /users:
  *   get:

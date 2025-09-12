@@ -1,6 +1,7 @@
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
+import path from "path";
 import { connectDB } from "./config/db";
 import { ENV } from "./config/env";
 import { errorHandler } from "./middleware/errorHandler";
@@ -23,6 +24,9 @@ const serverUrl =
     ? `${ENV.DOMAIN}/api` // use your domain in production
     : `http://localhost:${ENV.PORT}/api`;
 
+// ✅ Serve static files from "public"
+app.use(express.static(path.join(__dirname, "../public")));
+
 // ✅ Step 2: CORS middleware
 app.use(
   cors({
@@ -40,7 +44,7 @@ app.use(
 app.use(express.json());
 
 // ✅ Step 3: DB connection
-connectDB(process.env.MONGO_URI || "mongodb://127.0.0.1:27017/payinvflow");
+connectDB(ENV.DB_URL || "mongodb://127.0.0.1:27017/payinvflow");
 
 // ✅ Step 4: Health route
 app.get("/", (_, res) => {
