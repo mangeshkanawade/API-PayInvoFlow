@@ -1,4 +1,5 @@
-import { Express } from "express";
+import express, { Express } from "express";
+import path from "path";
 import swaggerJsdoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 import { ENV } from "./config/env";
@@ -40,24 +41,23 @@ const options: swaggerJsdoc.Options = {
 const swaggerSpec = swaggerJsdoc(options);
 
 const swaggerOptions = {
-  validatorUrl: null, // Disable online spec validator
-  deepLinking: true, // Enable deep linking for tags/operations
-  displayOperationId: false, // Show operationId in the UI
-  defaultModelsExpandDepth: 1, // Expansion depth for models (-1 hides them)
-  defaultModelExpandDepth: 1, // Expansion depth for the model on model-example section
-  defaultModelRendering: "example", // "model" or "example" by default
-  displayRequestDuration: true, // Show request duration for "Try it out"
-  docExpansion: "list", // "none", "list" or "full" (UI default expansion)
-  filter: true, // Enable operation filtering (true/string)
-  maxDisplayedTags: 8, // Limit the number of tags displayed
-  showExtensions: true, // Show vendor extensions (x- fields)
-  showCommonExtensions: true, // Show pattern/maxLength/minLength etc.
-  operationsSorter: "alpha", // Sort operations: "alpha" | "method" | function
-  tagsSorter: "alpha", // Sort tags: "alpha" | function
-  useUnsafeMarkdown: false, // Leave style/class/data-* attributes (deprecated)
-  tryItOutEnabled: true, // Enable “Try it out” by default
+  validatorUrl: null,
+  deepLinking: true,
+  displayOperationId: false,
+  defaultModelsExpandDepth: 1,
+  defaultModelExpandDepth: 1,
+  defaultModelRendering: "example",
+  displayRequestDuration: true,
+  docExpansion: "list",
+  filter: true,
+  maxDisplayedTags: 8,
+  showExtensions: true,
+  showCommonExtensions: true,
+  operationsSorter: "alpha",
+  tagsSorter: "alpha",
+  useUnsafeMarkdown: false,
+  tryItOutEnabled: true,
   supportedSubmitMethods: [
-    // Methods allowed for “Try it out”
     "get",
     "put",
     "post",
@@ -67,25 +67,27 @@ const swaggerOptions = {
     "patch",
     "trace",
   ],
-  requestSnippetsEnabled: false, // Show request code snippets
-  oauth2RedirectUrl: undefined, // Custom OAuth2 redirect URL
-  withCredentials: false, // Send credentials with CORS requests
-  persistAuthorization: true, // Persist auth on browser reload
-  // syntaxHighlight can be customized if needed:
-  // syntaxHighlight: { activated: true, theme: "monokai" },
-  // explorer: true,
+  requestSnippetsEnabled: false,
+  oauth2RedirectUrl: undefined,
+  withCredentials: false,
+  persistAuthorization: true,
 };
 
 export function swaggerDocs(app: Express, port: number) {
+  app.use(
+    "/swagger-ui",
+    express.static(path.join(__dirname, "../node_modules/swagger-ui-dist"))
+  );
+
   app.use(
     "/api-docs",
     swaggerUi.serve,
     swaggerUi.setup(swaggerSpec, {
       swaggerOptions: swaggerOptions,
-      customCssUrl: "https://unpkg.com/swagger-ui-dist/swagger-ui.css",
+      customCssUrl: "/swagger-ui/swagger-ui.css",
       customJs: [
-        "https://unpkg.com/swagger-ui-dist/swagger-ui-bundle.js",
-        "https://unpkg.com/swagger-ui-dist/swagger-ui-standalone-preset.js",
+        "/swagger-ui/swagger-ui-bundle.js",
+        "/swagger-ui/swagger-ui-standalone-preset.js",
       ],
     })
   );

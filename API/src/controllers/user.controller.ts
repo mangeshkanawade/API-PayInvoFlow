@@ -69,20 +69,38 @@ export const UserController = {
   getByUserEmail: async (req: Request, res: Response) => {
     try {
       const { email } = req.params;
-
       const user = await service.getByUserEmail(email);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
-
       const plainUser = user.toObject ? user.toObject() : user;
       const safeUser = plainToInstance(UserDTO, plainUser, {
         excludeExtraneousValues: true,
       });
-
       res.json({ user: safeUser });
     } catch (err: any) {
       res.status(500).json({ message: err.message });
+    }
+  },
+
+  forgotPassword: async (req: Request, res: Response) => {
+    try {
+      const { email } = req.body;
+      const token = await service.forgotPassword(email);
+      // In production, send token via email. For demo, return token in response.
+      res.json({ message: "Reset token generated", token });
+    } catch (err: any) {
+      res.status(404).json({ message: err.message });
+    }
+  },
+
+  resetPassword: async (req: Request, res: Response) => {
+    try {
+      const { token, newPassword } = req.body;
+      await service.resetPassword(token, newPassword);
+      res.json({ message: "Password reset successful" });
+    } catch (err: any) {
+      res.status(400).json({ message: err.message });
     }
   },
 };

@@ -4,6 +4,9 @@ import { IUser } from "../models/user.model";
 import { UserRepository } from "../repositories/user.repository";
 import { BaseService } from "./base.service";
 
+import crypto from "crypto";
+import { UserModel } from "../models/user.model";
+
 export class UserService extends BaseService<IUser> {
   private jwtSecret: string;
 
@@ -50,5 +53,37 @@ export class UserService extends BaseService<IUser> {
 
   async getByUsername(username: string) {
     return this.repo.findByUsername(username);
+  }
+
+  /**
+   * Generates a password reset token and sets expiry, then returns token
+   */
+  async forgotPassword(email: string): Promise<string> {
+    const user = await this.repo.findByEmail(email);
+    if (!user) throw new Error("User not found");
+
+    const token = crypto.randomBytes(32).toString("hex");
+    user.resetPasswordToken = token;
+    user.resetPasswordExpires = new Date(Date.now() + 3600000); // 1 hour
+    await user.save();
+    // You should send this token via email to the user
+    return token;
+  }
+
+  /**
+   * Resets the user's password using the token
+   */
+  async resetPassword(token: string, newPassword: string): Promise<boolean> {
+    const user = await UserModel.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: new Date() },
+    });
+    if (!user) throw new Error("Invalid or expired token");
+
+    user.password = await bcrypt.hash(newPassword, 10);
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+    return true;
   }
 }

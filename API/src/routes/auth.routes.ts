@@ -31,4 +31,59 @@ const router = Router();
  */
 router.post("/login", UserController.login);
 
+/**
+ * @openapi
+ * /auth/forgot-password:
+ *   post:
+ *     summary: Request password reset
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: test@example.com
+ *     responses:
+ *       200:
+ *         description: Reset token sent to email
+ *       404:
+ *         description: User not found
+ */
+router.post("/forgot-password", UserController.forgotPassword);
+
+/**
+ * @openapi
+ * /auth/reset-password:
+ *   post:
+ *     summary: Reset password using token
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - token
+ *               - newPassword
+ *             properties:
+ *               token:
+ *                 type: string
+ *               newPassword:
+ *                 type: string
+ *                 example: NewPass@123
+ *     responses:
+ *       200:
+ *         description: Password reset successful
+ *       400:
+ *         description: Invalid or expired token
+ */
+router.post("/reset-password", UserController.resetPassword);
+
 export default router;
