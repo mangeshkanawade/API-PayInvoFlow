@@ -3,3 +3,6 @@
 */dist/*
 API/src/uploads/*
 API/src/docs/*
+*.env*
+API/src/config/google-drive-settings.json
+*.env

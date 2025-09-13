@@ -7,6 +7,7 @@ import { InvoiceService } from "../services/invoice.service";
 import authRoutes from "./auth.routes";
 import clientRoutes from "./client.routes";
 import companyRoutes from "./company.routes";
+import googleDriveRoutes from "./googledrive.routes";
 import invoiceRoutes from "./invoice.routes";
 import invoiceItemRoutes from "./invoiceItem.routes";
 import userRoutes from "./user.routes";
@@ -21,11 +22,15 @@ router.use("/clients", authMiddleware, clientRoutes);
 router.use("/invoices", authMiddleware, invoiceRoutes);
 router.use("/invoice-items", authMiddleware, invoiceItemRoutes);
 
+router.use("/drive", googleDriveRoutes);
+
 //Temp Code
 
 const repo = new BaseRepository<IInvoice>(InvoiceModel);
 const service = new InvoiceService(repo);
 const controller = new InvoiceController(service);
 router.get("/pdf", controller.exportPdfFile);
+
+router.get("/googledrive", controller.googleDrive);
 
 export default router;

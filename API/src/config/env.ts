@@ -9,13 +9,11 @@ const envFile =
 dotenv.config({ path: path.resolve(process.cwd(), envFile) });
 
 export const ENV = {
-  NODE_ENV: process.env.NODE_ENV || "development",
-  PORT: process.env.PORT || "3000",
-  SWAGGER_APIS: process.env.SWAGGER_APIS || "src/routes/*.ts",
-  DB_URL:
-    process.env.DB_URL ||
-    "mongodb+srv://kanawade84_db_user:8MwP90H1pQsZfr8J@payinvflowcluster.u0jycte.mongodb.net/payinvflow",
-  DOMAIN:
-    process.env.DOMAIN || `http://localhost:${process.env.PORT || "3000"}`,
-  JWT_SECRET: process.env.JWT_SECRET || "PayInvFlowSuperSecretKey123",
+  NODE_ENV: process.env.NODE_ENV,
+  PORT: process.env.PORT,
+  DB_URL: process.env.DB_URL,
+  DOMAIN: process.env.DOMAIN,
+  JWT_SECRET: process.env.JWT_SECRET,
+  GOOGLE_DRIVE_FOLDER_ID: process.env.GOOGLE_DRIVE_FOLDER_ID,
+  GOOGLE_SERVICE_ACCOUNT_KEY: process.env.GOOGLE_SERVICE_ACCOUNT_KEY,
 };

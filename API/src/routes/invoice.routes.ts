@@ -282,4 +282,16 @@ router.get("/company/:companyId", controller.getByCompany);
  */
 router.get("/pdf", controller.exportPdfFile);
 
+/**
+ * @openapi
+ * /googledrive:
+ *   get:
+ *     summary: Google Drive Service
+ *     tags: [Google Drive]
+ *     responses:
+ *       200:
+ *         description: Google Drive Service
+ */
+router.get("/googledrive", controller.googleDrive);
+
 export default router;
