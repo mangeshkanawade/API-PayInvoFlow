@@ -14,6 +14,4 @@ export const ENV = {
   DB_URL: process.env.DB_URL,
   DOMAIN: process.env.DOMAIN,
   JWT_SECRET: process.env.JWT_SECRET,
-  GOOGLE_DRIVE_FOLDER_ID: process.env.GOOGLE_DRIVE_FOLDER_ID,
-  GOOGLE_SERVICE_ACCOUNT_KEY: process.env.GOOGLE_SERVICE_ACCOUNT_KEY,
 };
