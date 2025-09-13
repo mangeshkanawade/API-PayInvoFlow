@@ -12,6 +12,7 @@ export interface ICompany extends Document {
   bankBranch: string;
   accountNumber: string;
   ifscCode: string;
+  logo: string;
 }
 
 const CompanySchema = new Schema<ICompany>(
@@ -27,6 +28,7 @@ const CompanySchema = new Schema<ICompany>(
     bankBranch: { type: String, required: true },
     accountNumber: { type: String, required: true },
     ifscCode: { type: String, required: true },
+    logo: { type: String },
   },
   { timestamps: true }
 );

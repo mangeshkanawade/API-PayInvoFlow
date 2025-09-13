@@ -1,8 +1,6 @@
 import { Request, Response } from "express";
 import { IInvoice } from "../models/invoice.model";
-import { GoogleDriveService } from "../services/googledrive.service";
 import { InvoiceService } from "../services/invoice.service";
-import { ENV } from "./../config/env";
 import { BaseController } from "./base.controller";
 
 export class InvoiceController extends BaseController<IInvoice> {
@@ -36,16 +34,9 @@ export class InvoiceController extends BaseController<IInvoice> {
   };
 
   exportPdfFile = async (req: Request, res: Response) => {
-    const pdfBuffer = await this.invoiceService.exportPdfFile();
+    const pdfBuffer = await this.invoiceService.exportPdfFile("");
     res.setHeader("Content-Type", "application/pdf");
     res.send(pdfBuffer);
-  };
-
-  googleDrive = async (req: Request, res: Response) => {
-    const svc = new GoogleDriveService();
-    console.log("Listing files...");
-    const files = await svc.listFiles(ENV.GOOGLE_DRIVE_FOLDER_ID);
-    console.log(files);
   };
 
   // Get invoices by Client ID

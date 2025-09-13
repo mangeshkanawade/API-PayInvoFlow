@@ -46,6 +46,8 @@ app.use(express.json());
 // ✅ Step 3: DB connection
 connectDB(ENV.DB_URL || "mongodb://127.0.0.1:27017/payinvflow");
 
+//SeedHelper.run();
+
 // ✅ Step 4: Health route
 app.get("/", (_, res) => {
   res.send(`Running in ${ENV.NODE_ENV} mode 🚀`);

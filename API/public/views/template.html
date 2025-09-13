@@ -50,7 +50,7 @@
               >
                 <!-- Logo -->
                 <img
-                  src="data:image/png;base64,{{company.logo}}"
+                  src="{{company.logo}}"
                   alt="Logo"
                   style="height: 64px; width: auto"
                 />
@@ -102,17 +102,17 @@
               <div style="font-size: 10px; margin-top: 4px">
                 <span style="font-weight: 600">Tax Invoice No:</span>
                 <span style="font-family: Consolas, Menlo, Monaco, monospace">
-                  {{invoice.taxNo}}
+                  {{invoice.number}}
                 </span>
               </div>
               <div style="font-size: 10px; margin-top: 2px">
                 <span style="font-weight: 600">Tax Invoice date:</span>
                 <span style="font-family: Consolas, Menlo, Monaco, monospace">
-                  {{invoice.taxDate}}
+                  {{invoice.date}}
                 </span>
               </div>
               <div style="font-size: 10px; margin-top: 6px">
-                <span style="font-weight: 600">State Code</span>
+                <span style="font-weight: 600">State Code : </span>
                 <span
                   style="
                     display: inline-block;
@@ -124,10 +124,11 @@
                     background: #fafafa;
                   "
                 >
-                  {{invoice.stateCode}}
+                  {{company.stateCode}}
                 </span>
-                <span style="margin-left: 8px">
-                  | State: {{invoice.stateName}}
+                <span style="margin-left: 8px"
+                  ><span style="font-weight: 600"> | &nbsp; State : </span>
+                  {{company.state}}
                 </span>
               </div>
             </td>
@@ -511,7 +512,7 @@
                       color: #374151;
                     "
                   >
-                    CGST {{totals.cgstRate}}%
+                    CGST {{invoice.cgstRate}}%
                   </div>
                   <div
                     style="
@@ -526,7 +527,7 @@
                       class="fa-solid fa-indian-rupee-sign"
                       style="margin-right: 2px"
                     ></i>
-                    {{totals.cgstAmount}}
+                    {{totals.cgst}}
                   </div>
                 </div>
 
@@ -540,7 +541,7 @@
                       color: #374151;
                     "
                   >
-                    SGST {{totals.sgstRate}}%
+                    SGST {{invoice.sgstRate}}%
                   </div>
                   <div
                     style="
@@ -611,11 +612,11 @@
                 class="fa-solid fa-indian-rupee-sign"
                 style="margin-right: 2px"
               ></i>
-              {{totals.grand}}
+              {{totals.grandTotal}}
             </div>
           </div>
           <span style="font-weight: 200; color: #374151; margin-top: 5px"
-            >({{totals.inWords}})
+            >({{totals.amountInWords}})
           </span>
         </div>
       </div>
@@ -694,7 +695,7 @@
         "
       >
         <img
-          src="data:image/png;base64,{{business.logo}}"
+          src="{{business.logo}}"
           alt="PayInvoFlow Logo"
           style="height: 18px; width: auto"
         />

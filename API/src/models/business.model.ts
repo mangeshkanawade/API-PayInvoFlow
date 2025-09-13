@@ -1,4 +1,4 @@
-import mongoose, { Document, Model, Schema } from "mongoose";
+import mongoose, { Document, Schema } from "mongoose";
 
 export interface IBusiness extends Document {
   name: string;
@@ -49,7 +49,7 @@ const BusinessSchema = new Schema<IBusiness>(
   }
 );
 
-export const BusinessModel: Model<IBusiness> = mongoose.model(
+export const BusinessModel = mongoose.model<IBusiness>(
   "Business",
   BusinessSchema
 );
