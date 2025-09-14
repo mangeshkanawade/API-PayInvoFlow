@@ -1,8 +1,12 @@
+.vercel
 */.vscode/*
 */node_modules/*
 */dist/*
-API/src/uploads/*
-API/src/docs/*
+src/uploads/*
+src/docs/*
 *.env*
-API/src/config/google-drive-settings.json
+src/config/google-drive-settings.json
 *.env
+node_modules
+.vscode/launch.json
+dist/*
