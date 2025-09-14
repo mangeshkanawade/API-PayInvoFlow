@@ -62,7 +62,7 @@ export class SeedHelper {
 
       // Insert Company
       const company = await CompanyModel.create({
-        companyName: "Ansh Enterpries",
+        name: "Ansh Enterpries",
         address: "Karegaon, Pune Maharashtra",
         email: "anshenterpries@gmail.com",
         phone: "+91-9988776655",

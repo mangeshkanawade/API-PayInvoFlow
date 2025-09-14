@@ -2,13 +2,13 @@ import { Router } from "express";
 import { BaseController } from "../controllers/base.controller";
 import { CompanyModel, ICompany } from "../models/company.model";
 import { BaseRepository } from "../repositories/base.repository";
-import { BaseService } from "../services/base.service";
+import { CompanyService } from "../services/company.service";
 
 const router = Router();
 
 // Layered wiring
 const repo = new BaseRepository<ICompany>(CompanyModel);
-const service = new BaseService(repo);
+const service = new CompanyService(repo);
 const controller = new BaseController(service);
 
 /**
@@ -25,7 +25,7 @@ const controller = new BaseController(service);
  *     Company:
  *       type: object
  *       required:
- *         - companyName
+ *         - name
  *         - address
  *         - email
  *         - phone
@@ -40,7 +40,7 @@ const controller = new BaseController(service);
  *         id:
  *           type: string
  *           description: Auto-generated company ID
- *         companyName:
+ *         name:
  *           type: string
  *           example: Ansh Enterprises
  *         address:

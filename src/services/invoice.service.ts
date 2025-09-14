@@ -112,7 +112,7 @@ export class InvoiceService extends BaseService<IInvoice> {
 
     const pdfData = {
       company: {
-        name: invoice.company?.companyName ?? "",
+        name: invoice.company?.name ?? "",
         gstin: invoice.company?.gstin ?? "",
         address: invoice.company?.address ?? "",
         stateCode: invoice.company?.stateCode ?? "",
@@ -224,7 +224,7 @@ export class InvoiceService extends BaseService<IInvoice> {
     try {
       await mailService.sendMail(
         client.email,
-        `Invoice #${invoice.invoiceNumber} from ${company.companyName}`,
+        `Invoice #${invoice.invoiceNumber} from ${company.name}`,
         "Please find attached your invoice.",
         generateInvoiceEmailTemplate(
           company,
@@ -248,7 +248,7 @@ export class InvoiceService extends BaseService<IInvoice> {
       // Log success
       await EmailLogModel.create({
         to: client.email,
-        subject: `Invoice #${invoice.invoiceNumber} from ${company.companyName}`,
+        subject: `Invoice #${invoice.invoiceNumber} from ${company.name}`,
         body: `Please find attached your invoice.`,
         attachments: [`Invoice-${invoice.invoiceNumber}.pdf`],
         sentAt: new Date(),
@@ -260,7 +260,7 @@ export class InvoiceService extends BaseService<IInvoice> {
       // Log failure
       await EmailLogModel.create({
         to: client.email,
-        subject: `Invoice #${invoice.invoiceNumber} from ${company.companyName}`,
+        subject: `Invoice #${invoice.invoiceNumber} from ${company.name}`,
         body: `Please find attached your invoice.`,
         attachments: [`Invoice-${invoice.invoiceNumber}.pdf`],
         sentAt: new Date(),

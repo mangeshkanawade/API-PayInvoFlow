@@ -30,7 +30,7 @@ export function generateInvoiceEmailTemplate(
 
     <!-- Company Info -->
     <p style="margin-top:20px;">Best regards,</p>
-    <p><b>${company.companyName}</b><br/>
+    <p><b>${company.name}</b><br/>
     ${company.email} | ${company.phone}</p>
 
     <!-- Business Promotion -->

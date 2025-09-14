@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema } from "mongoose";
 
 export interface ICompany extends Document {
-  companyName: string;
+  name: string;
   address: string;
   email: string;
   phone: string;
@@ -17,7 +17,7 @@ export interface ICompany extends Document {
 
 const CompanySchema = new Schema<ICompany>(
   {
-    companyName: { type: String, required: true },
+    name: { type: String, required: true },
     address: { type: String, required: true },
     email: { type: String, required: true },
     phone: { type: String, required: true },

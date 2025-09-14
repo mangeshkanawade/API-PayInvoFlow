@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { InvoiceController } from "../controllers/invoice.controller";
-import { authMiddleware } from "../middleware/auth";
 import { IInvoice, InvoiceModel } from "../models/invoice.model";
 import { BaseRepository } from "../repositories/base.repository";
 import { InvoiceService } from "../services/invoice.service";
@@ -15,11 +14,11 @@ const router = Router();
 
 // Alphabetical order
 router.use("/auth", authRoutes);
-router.use("/users", authMiddleware, userRoutes);
-router.use("/company", authMiddleware, companyRoutes);
-router.use("/clients", authMiddleware, clientRoutes);
-router.use("/invoices", authMiddleware, invoiceRoutes);
-router.use("/invoice-items", authMiddleware, invoiceItemRoutes);
+router.use("/users", userRoutes);
+router.use("/company", companyRoutes);
+router.use("/clients", clientRoutes);
+router.use("/invoices", invoiceRoutes);
+router.use("/invoice-items", invoiceItemRoutes);
 
 //Temp Code
 
