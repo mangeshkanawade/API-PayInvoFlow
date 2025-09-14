@@ -39,6 +39,16 @@ export class InvoiceController extends BaseController<IInvoice> {
     res.send(pdfBuffer);
   };
 
+  sendInvoiceEmail = async (req: Request, res: Response) => {
+    try {
+      const { invoiceId } = req.params;
+      await this.invoiceService.sendInvoiceEmail(invoiceId);
+      res.json({ success: true, message: "Invoice email sent" });
+    } catch (err: any) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  };
+
   // Get invoices by Client ID
   getByClient = async (req: Request, res: Response) => {
     const result = await this.invoiceService.getByClient(req.params.clientId);

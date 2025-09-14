@@ -8,6 +8,7 @@ export interface IInvoice extends Document {
   cgstRate?: number;
   sgstRate?: number;
   status: "Draft" | "Paid" | "Cancelled";
+  dueDate?: Date;
 }
 
 const InvoiceSchema = new Schema<IInvoice>(
@@ -19,8 +20,12 @@ const InvoiceSchema = new Schema<IInvoice>(
     cgstRate: { type: Number, default: 6.0 },
     sgstRate: { type: Number, default: 6.0 },
     status: { type: String, default: "Draft" },
+    dueDate: { type: Date },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    versionKey: false,
+  }
 );
 
 export const InvoiceModel = mongoose.model<IInvoice>("Invoice", InvoiceSchema);

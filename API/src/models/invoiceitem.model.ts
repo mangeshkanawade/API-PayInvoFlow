@@ -22,7 +22,10 @@ const InvoiceItemSchema = new Schema<IInvoiceItem>(
     rate: { type: Number },
     amount: { type: Number, required: true },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    versionKey: false,
+  }
 );
 
 export const InvoiceItemModel = mongoose.model<IInvoiceItem>(

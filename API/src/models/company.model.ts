@@ -30,7 +30,10 @@ const CompanySchema = new Schema<ICompany>(
     ifscCode: { type: String, required: true },
     logo: { type: String },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    versionKey: false,
+  }
 );
 
 export const CompanyModel = mongoose.model<ICompany>("Company", CompanySchema);

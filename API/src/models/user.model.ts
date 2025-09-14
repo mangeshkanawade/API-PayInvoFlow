@@ -28,7 +28,10 @@ const UserSchema = new Schema<IUser>(
     resetPasswordExpires: { type: Date },
     refreshToken: { type: String },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    versionKey: false,
+  }
 );
 
 export const UserModel = mongoose.model<IUser>("User", UserSchema);

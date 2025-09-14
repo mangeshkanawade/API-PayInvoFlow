@@ -23,7 +23,10 @@ const InvoiceAmountSchema = new Schema<IInvoiceAmount>(
     grandTotal: { type: Number, required: true },
     amountInWords: { type: String, required: true },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    versionKey: false,
+  }
 );
 
 export const InvoiceAmountModel = mongoose.model<IInvoiceAmount>(

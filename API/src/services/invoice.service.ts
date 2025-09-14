@@ -9,6 +9,8 @@ import { InvoiceAmountModel } from "../models/invoiceamount.model";
 import { InvoiceItemModel } from "../models/invoiceitem.model";
 import { BaseRepository } from "../repositories/base.repository";
 import { BaseService } from "../services/base.service";
+import { generateInvoiceEmailTemplate } from "../utils/emailTemplates";
+import { MailService } from "./mail.service";
 export class InvoiceService extends BaseService<IInvoice> {
   constructor(public repo: BaseRepository<IInvoice>) {
     super(repo);
@@ -162,5 +164,83 @@ export class InvoiceService extends BaseService<IInvoice> {
     };
 
     return pdfGenerator(pdfData);
+  }
+
+  async sendInvoiceEmail(invoiceId: string) {
+    const [invoice, items, business, invoiceAmounts] = (await Promise.all([
+      InvoiceModel.findById(invoiceId)
+        .populate("client")
+        .populate("company")
+        .lean()
+        .exec(),
+      InvoiceItemModel.find({ invoice: invoiceId }).lean().exec(),
+      BusinessModel.findOne({ email: "payinvoflow@gmail.com" }).lean().exec(),
+      InvoiceAmountModel.findOne({ invoice: invoiceId }).lean().exec(),
+    ])) as any;
+
+    if (!invoice) {
+      throw new Error("Invoice not found");
+    }
+
+    const client = invoice.client;
+    const company = invoice.company;
+
+    const subtotalAmt = items.reduce(
+      (sum: any, i: any) => sum + (i.amount ?? 0),
+      0
+    );
+
+    const { subtotal, cgstAmount, sgstAmount, grandTotal, amountInWords } =
+      await InvoiceCalculator.calculateTotals(
+        subtotalAmt,
+        invoice?.cgstRate,
+        invoice?.sgstRate
+      );
+
+    await InvoiceAmountModel.replaceOne(
+      { invoice: invoice._id },
+      {
+        invoice: invoice._id,
+        subtotal,
+        cgstAmount,
+        sgstAmount,
+        grandTotal,
+        amountInWords,
+      },
+      { upsert: true }
+    );
+
+    const invoiceAmount = (await InvoiceAmountModel.findOne({
+      invoice: invoiceId,
+    })
+      .lean()
+      .exec()) as any;
+
+    const pdfBuffer = await this.exportPdfFile(invoiceId);
+
+    const mailService = new MailService();
+
+    await mailService.sendMail(
+      client.email,
+      `Invoice #${invoice.invoiceNumber} from ${company.companyName}`,
+      "Please find attached your invoice.",
+      generateInvoiceEmailTemplate(
+        company,
+        client,
+        invoice.invoiceNumber,
+        invoice.invoiceDate,
+        new Date().setDate(new Date().getDate() + 30).toString(),
+        invoiceAmount.grandTotal,
+        business
+      ),
+      [
+        {
+          filename: `Invoice-${invoice.invoiceNumber}.pdf`,
+          content: pdfBuffer,
+        },
+      ]
+    );
+
+    console.log("✅ Invoice email sent to:", client.email);
   }
 }

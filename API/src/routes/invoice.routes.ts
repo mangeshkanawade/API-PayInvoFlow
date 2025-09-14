@@ -282,4 +282,49 @@ router.get("/company/:companyId", controller.getByCompany);
  */
 router.get("/pdf", controller.exportPdfFile);
 
+/**
+ * @swagger
+ * /invoices/{invoiceId}/send-email:
+ *   post:
+ *     summary: Send invoice email to client
+ *     description: Sends the invoice email with PDF attachment to the client associated with the given invoiceId.
+ *     tags:
+ *       - Invoices
+ *     parameters:
+ *       - in: path
+ *         name: invoiceId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID of the invoice to email
+ *     responses:
+ *       200:
+ *         description: Invoice email sent successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Invoice email sent
+ *       500:
+ *         description: Server error while sending invoice email
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 error:
+ *                   type: string
+ *                   example: Invoice not found
+ */
+router.post("/:invoiceId/send-email", controller.sendInvoiceEmail);
+
 export default router;

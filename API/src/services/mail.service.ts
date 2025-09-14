@@ -20,7 +20,8 @@ export class MailService {
     to: string,
     subject: string,
     text: string,
-    html?: string
+    html?: string,
+    attachments?: Array<{ filename: string; content: Buffer | string }>
   ): Promise<void> {
     try {
       const info = await this.transporter.sendMail({
@@ -29,6 +30,7 @@ export class MailService {
         subject,
         text,
         html,
+        attachments,
       });
 
       console.log("✅ Email sent:", info.messageId);

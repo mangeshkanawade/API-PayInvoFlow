@@ -21,7 +21,10 @@ const clientSchema = new Schema<IClient>(
     state: { type: String, required: true },
     stateCode: { type: String, required: true, minlength: 2, maxlength: 2 },
   },
-  { timestamps: { createdAt: true, updatedAt: false } }
+  {
+    timestamps: true,
+    versionKey: false,
+  }
 );
 
 export const ClientModel = model<IClient>("Client", clientSchema);
