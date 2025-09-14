@@ -6,6 +6,7 @@ import { connectDB } from "./config/db";
 import { ENV } from "./config/env";
 import { errorHandler } from "./middleware/errorHandler";
 import routes from "./routes/index.routes";
+import { MailService } from "./services/mail.service";
 import { swaggerDocs } from "./swagger";
 
 dotenv.config();
@@ -47,6 +48,20 @@ app.use(express.json());
 connectDB(ENV.DB_URL || "mongodb://127.0.0.1:27017/payinvflow");
 
 //SeedHelper.run();
+app.get("/send-email", async (req, res) => {
+  const mailService = new MailService();
+  try {
+    await mailService.sendMail(
+      "kanawade84@gmail.com",
+      "Triggered Notification",
+      "This email was triggered by hitting /send-email endpoint 🚀",
+      "<b>This is a test email sent via <i>/send-email</i> route</b>"
+    );
+    res.json({ success: true, message: "Email sent successfully" });
+  } catch (error) {
+    res.status(500).json({ success: false, error });
+  }
+});
 
 // ✅ Step 4: Health route
 app.get("/", (_, res) => {
