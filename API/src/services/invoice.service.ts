@@ -4,6 +4,7 @@ import { InvoiceCalculator } from "../helper/invoiceCalculator";
 import { amountToWords } from "../helper/numberToWords";
 import { pdfGenerator } from "../helper/pdfGenerator";
 import { BusinessModel } from "../models/business.model";
+import { EmailLogModel } from "../models/emailLog.model";
 import { IInvoice, InvoiceModel } from "../models/invoice.model";
 import { InvoiceAmountModel } from "../models/invoiceamount.model";
 import { InvoiceItemModel } from "../models/invoiceitem.model";
@@ -220,27 +221,54 @@ export class InvoiceService extends BaseService<IInvoice> {
 
     const mailService = new MailService();
 
-    await mailService.sendMail(
-      client.email,
-      `Invoice #${invoice.invoiceNumber} from ${company.companyName}`,
-      "Please find attached your invoice.",
-      generateInvoiceEmailTemplate(
-        company,
-        client,
-        invoice.invoiceNumber,
-        invoice.invoiceDate,
-        new Date().setDate(new Date().getDate() + 30).toString(),
-        invoiceAmount.grandTotal,
-        business
-      ),
-      [
-        {
-          filename: `Invoice-${invoice.invoiceNumber}.pdf`,
-          content: pdfBuffer,
-        },
-      ]
-    );
+    try {
+      await mailService.sendMail(
+        client.email,
+        `Invoice #${invoice.invoiceNumber} from ${company.companyName}`,
+        "Please find attached your invoice.",
+        generateInvoiceEmailTemplate(
+          company,
+          client,
+          invoice.invoiceNumber,
+          invoice.invoiceDate,
+          new Date().setDate(new Date().getDate() + 30).toString(),
+          invoiceAmount.grandTotal,
+          business
+        ),
+        [
+          {
+            filename: `Invoice-${invoice.invoiceNumber}.pdf`,
+            content: pdfBuffer,
+          },
+        ]
+      );
 
-    console.log("✅ Invoice email sent to:", client.email);
+      console.log("✅ Invoice email sent to:", client.email);
+
+      // Log success
+      await EmailLogModel.create({
+        to: client.email,
+        subject: `Invoice #${invoice.invoiceNumber} from ${company.companyName}`,
+        body: `Please find attached your invoice.`,
+        attachments: [`Invoice-${invoice.invoiceNumber}.pdf`],
+        sentAt: new Date(),
+        status: "SENT",
+      });
+    } catch (error: any) {
+      console.error("❌ Failed to send invoice email:", error);
+
+      // Log failure
+      await EmailLogModel.create({
+        to: client.email,
+        subject: `Invoice #${invoice.invoiceNumber} from ${company.companyName}`,
+        body: `Please find attached your invoice.`,
+        attachments: [`Invoice-${invoice.invoiceNumber}.pdf`],
+        sentAt: new Date(),
+        status: "FAILED",
+        errorMessage: error.message,
+      });
+
+      throw error; // rethrow if you want controller to handle
+    }
   }
 }
