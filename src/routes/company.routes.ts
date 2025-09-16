@@ -1,5 +1,6 @@
 import { Router } from "express";
-import { BaseController } from "../controllers/base.controller";
+import { CompanyController } from "../controllers/company.controller";
+import { upload } from "../middleware/multer";
 import { CompanyModel, ICompany } from "../models/company.model";
 import { BaseRepository } from "../repositories/base.repository";
 import { CompanyService } from "../services/company.service";
@@ -9,7 +10,7 @@ const router = Router();
 // Layered wiring
 const repo = new BaseRepository<ICompany>(CompanyModel);
 const service = new CompanyService(repo);
-const controller = new BaseController(service);
+const controller = new CompanyController(service);
 
 /**
  * @openapi
@@ -110,7 +111,10 @@ const controller = new BaseController(service);
  *       201:
  *         description: Company created successfully
  */
-router.route("/").get(controller.getAll).post(controller.create);
+router.route("/").get((req, res) => controller.getAll(req, res));
+router.post("/", upload.single("logo"), (req, res) =>
+  controller.create(req, res)
+);
 
 /**
  * @openapi
@@ -167,8 +171,8 @@ router.route("/").get(controller.getAll).post(controller.create);
  */
 router
   .route("/:id")
-  .get(controller.getById)
-  .put(controller.update)
-  .delete(controller.delete);
+  .get((req, res) => controller.getById(req, res))
+  .put(upload.single("logo"), (req, res) => controller.update(req, res))
+  .delete((req, res) => controller.delete(req, res));
 
 export default router;

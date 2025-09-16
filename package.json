@@ -16,6 +16,7 @@
     "@sparticuz/chromium": "^138.0.2",
     "@types/mime-types": "^3.0.1",
     "@types/puppeteer": "^5.4.7",
+    "@vercel/blob": "^2.0.0",
     "bcryptjs": "^3.0.2",
     "class-transformer": "^0.5.1",
     "cors": "^2.8.5",

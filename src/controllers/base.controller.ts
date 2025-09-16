@@ -8,29 +8,32 @@ export class BaseController<T> {
     this.service = service;
   }
 
-  create = async (req: Request, res: Response) => {
+  async create(req: Request, res: Response): Promise<void> {
     const result = await this.service.create(req.body);
     res.json(result);
-  };
+  }
 
-  getAll = async (req: Request, res: Response) => {
+  async getAll(req: Request, res: Response): Promise<void> {
     const result = await this.service.getAll();
     res.json(result);
-  };
+  }
 
-  getById = async (req: Request, res: Response) => {
+  async getById(req: Request, res: Response): Promise<void> {
     const result = await this.service.getById(req.params.id!);
-    if (!result) return res.status(404).json({ message: "Not Found" });
+    if (!result) {
+      res.status(404).json({ message: "Not Found" });
+      return;
+    }
     res.json(result);
-  };
+  }
 
-  update = async (req: Request, res: Response) => {
+  async update(req: Request, res: Response): Promise<void> {
     const result = await this.service.update(req.params.id!, req.body);
     res.json(result);
-  };
+  }
 
-  delete = async (req: Request, res: Response) => {
+  async delete(req: Request, res: Response): Promise<void> {
     const result = await this.service.delete(req.params.id!);
     res.json(result);
-  };
+  }
 }

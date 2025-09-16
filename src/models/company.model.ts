@@ -13,6 +13,8 @@ export interface ICompany extends Document {
   accountNumber: string;
   ifscCode: string;
   logo: string;
+  logoKey: string;
+  status: "Active" | "Inactive";
 }
 
 const CompanySchema = new Schema<ICompany>(
@@ -29,6 +31,8 @@ const CompanySchema = new Schema<ICompany>(
     accountNumber: { type: String, required: true },
     ifscCode: { type: String, required: true },
     logo: { type: String },
+    logoKey: { type: String },
+    status: { type: String, default: "Active" },
   },
   {
     timestamps: true,
