@@ -90,7 +90,10 @@ const controller = new BaseController(service);
  *       201:
  *         description: Client created successfully
  */
-router.route("/").get(controller.getAll).post(controller.create);
+router
+  .route("/")
+  .get((req, res) => controller.getAll(req, res))
+  .post((req, res) => controller.create(req, res));
 
 /**
  * @openapi
@@ -143,8 +146,8 @@ router.route("/").get(controller.getAll).post(controller.create);
  */
 router
   .route("/:id")
-  .get(controller.getById)
-  .put(controller.update)
-  .delete(controller.delete);
+  .get((req, res) => controller.getById(req, res))
+  .put((req, res) => controller.update(req, res))
+  .delete((req, res) => controller.delete(req, res));
 
 export default router;

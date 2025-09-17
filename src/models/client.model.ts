@@ -8,7 +8,7 @@ export interface IClient extends Document {
   gstin: string;
   state: string;
   stateCode: string;
-  createdAt?: Date;
+  status: "Active" | "Inactive";
 }
 
 const clientSchema = new Schema<IClient>(
@@ -20,6 +20,7 @@ const clientSchema = new Schema<IClient>(
     gstin: { type: String, required: true, minlength: 15, maxlength: 15 },
     state: { type: String, required: true },
     stateCode: { type: String, required: true, minlength: 2, maxlength: 2 },
+    status: { type: String, default: "Active" },
   },
   {
     timestamps: true,
