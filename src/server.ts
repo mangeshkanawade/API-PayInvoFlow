@@ -17,6 +17,7 @@ const allowedOrigins = [
   "http://localhost:2000",
   "http://localhost:3000",
   "https://api-payinvoflow.vercel.app",
+  "https://payinvoflow.vercel.app",
 ];
 
 const serverUrl =
