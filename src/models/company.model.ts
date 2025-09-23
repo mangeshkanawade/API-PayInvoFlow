@@ -14,6 +14,7 @@ export interface ICompany extends Document {
   ifscCode: string;
   logo: string;
   logoKey: string;
+  invoicePrefix: string;
   status: "Active" | "Inactive";
 }
 
@@ -32,6 +33,7 @@ const CompanySchema = new Schema<ICompany>(
     ifscCode: { type: String, required: true },
     logo: { type: String },
     logoKey: { type: String },
+    invoicePrefix: { type: String },
     status: { type: String, default: "Active" },
   },
   {
