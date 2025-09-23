@@ -1,13 +1,13 @@
 import { Router } from "express";
 import { InvoiceItemController } from "../controllers/invoiceItem.controller";
-import { IInvoiceItem, InvoiceItemModel } from "../models/invoiceitem.model";
-import { BaseRepository } from "../repositories/base.repository";
+import { IInvoiceItem } from "../models/invoiceitem.model";
+import { InvoiceItemsRepository } from "../repositories/invoiceItems.repository";
 import { BaseService } from "../services/base.service";
 
 const router = Router();
 
 // Wiring repo → service → controller
-const repo = new BaseRepository<IInvoiceItem>(InvoiceItemModel);
+const repo = new InvoiceItemsRepository();
 const service = new BaseService<IInvoiceItem>(repo);
 const controller = new InvoiceItemController(service);
 

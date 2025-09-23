@@ -15,6 +15,8 @@ export interface ICompany extends Document {
   logo: string;
   logoKey: string;
   invoicePrefix: string;
+  cgstRate: number;
+  sgstRate: number;
   status: "Active" | "Inactive";
 }
 
@@ -34,6 +36,8 @@ const CompanySchema = new Schema<ICompany>(
     logo: { type: String },
     logoKey: { type: String },
     invoicePrefix: { type: String },
+    cgstRate: { type: Number, default: 6.0, min: 0, max: 100, required: true },
+    sgstRate: { type: Number, default: 6.0, min: 0, max: 100, required: true },
     status: { type: String, default: "Active" },
   },
   {

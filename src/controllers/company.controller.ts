@@ -29,6 +29,8 @@ export class CompanyController extends BaseController<ICompany> {
         accountNumber: req.body.accountNumber,
         ifscCode: req.body.ifscCode,
         invoicePrefix: req.body.invoicePrefix,
+        cgstRate: req.body.cgstRate,
+        sgstRate: req.body.sgstRate,
         status: req.body.status,
       };
 
@@ -60,6 +62,8 @@ export class CompanyController extends BaseController<ICompany> {
         accountNumber: req.body.accountNumber,
         ifscCode: req.body.ifscCode,
         invoicePrefix: req.body.invoicePrefix,
+        cgstRate: req.body.cgstRate,
+        sgstRate: req.body.sgstRate,
         status: req.body.status,
       };
 

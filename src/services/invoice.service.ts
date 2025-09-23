@@ -8,12 +8,12 @@ import { EmailLogModel } from "../models/emailLog.model";
 import { IInvoice, InvoiceModel } from "../models/invoice.model";
 import { InvoiceAmountModel } from "../models/invoiceamount.model";
 import { InvoiceItemModel } from "../models/invoiceitem.model";
-import { BaseRepository } from "../repositories/base.repository";
+import { InvoiceRepository } from "../repositories/invoice.repository";
 import { BaseService } from "../services/base.service";
 import { generateInvoiceEmailTemplate } from "../utils/emailTemplates";
 import { MailService } from "./mail.service";
 export class InvoiceService extends BaseService<IInvoice> {
-  constructor(public repo: BaseRepository<IInvoice>) {
+  constructor(public repo: InvoiceRepository) {
     super(repo);
   }
 
@@ -58,7 +58,6 @@ export class InvoiceService extends BaseService<IInvoice> {
   }
 
   async exportPdfFile(invoiceId: string): Promise<Buffer> {
-    invoiceId = "68c54296d8dd4104c4ab4cb5";
     if (!Types.ObjectId.isValid(invoiceId)) {
       throw new Error("Invalid invoice ID");
     }
@@ -151,7 +150,7 @@ export class InvoiceService extends BaseService<IInvoice> {
             subtotal: invoiceAmount.subtotal,
             cgst: invoiceAmount.cgstAmount,
             sgst: invoiceAmount.sgstAmount,
-            grandTotal: invoiceAmount.grandTotal,
+            grandTotal: invoiceAmount.grandTotal.toFixed(2),
             amountInWords: amountToWords(invoiceAmount.grandTotal),
           }
         : {},

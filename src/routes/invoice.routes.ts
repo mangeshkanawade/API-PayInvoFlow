@@ -1,13 +1,12 @@
 import { Router } from "express";
 import { InvoiceController } from "../controllers/invoice.controller";
-import { IInvoice, InvoiceModel } from "../models/invoice.model";
-import { BaseRepository } from "../repositories/base.repository";
+import { InvoiceRepository } from "../repositories/invoice.repository";
 import { InvoiceService } from "../services/invoice.service";
 
 const router = Router();
 
 // Wiring repo → service → controller
-const repo = new BaseRepository<IInvoice>(InvoiceModel);
+const repo = new InvoiceRepository();
 const service = new InvoiceService(repo);
 const controller = new InvoiceController(service);
 
@@ -114,7 +113,10 @@ const controller = new InvoiceController(service);
  *       201:
  *         description: Invoice created successfully
  */
-router.route("/").get(controller.getAll).post(controller.create);
+router
+  .route("/")
+  .get((req, res) => controller.getAll(req, res))
+  .post((req, res) => controller.create(req, res));
 
 /**
  * @openapi
@@ -170,9 +172,9 @@ router.route("/").get(controller.getAll).post(controller.create);
  */
 router
   .route("/:id")
-  .get(controller.getById)
-  .put(controller.update)
-  .delete(controller.delete);
+  .get((req, res) => controller.getById(req, res))
+  .put((req, res) => controller.update(req, res))
+  .delete((req, res) => controller.delete(req, res));
 
 /**
  * @openapi
@@ -230,7 +232,7 @@ router.put("/:id/status", controller.updateStatus);
  *       200:
  *         description: PDF generated successfully
  */
-router.get("/:id/pdf", controller.exportPdfFile);
+router.get("/:id/pdf", (req, res) => controller.exportPdfFile(req, res));
 
 /**
  * @openapi
