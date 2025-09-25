@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { PreviewInvoiceRequest } from "../dtos/previewInvoiceRequest";
 import { CompanyModel, ICompany } from "../models/company.model";
 import { IInvoice } from "../models/invoice.model";
 import { BaseRepository } from "../repositories/base.repository";
@@ -121,6 +122,18 @@ export class InvoiceController extends BaseController<IInvoice> {
         return;
       }
       res.json(invoice);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+
+  async previewInvoice(req: Request, res: Response): Promise<void> {
+    try {
+      const previewInvoiceRequest = req.body as PreviewInvoiceRequest;
+      const encryptedHtml = await this.invoiceService.previewInvoice(
+        previewInvoiceRequest
+      );
+      res.json({ html: encryptedHtml });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }

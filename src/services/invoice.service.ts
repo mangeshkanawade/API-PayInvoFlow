@@ -1,20 +1,38 @@
 import { Types } from "mongoose";
+import { PreviewInvoiceRequest } from "../dtos/previewInvoiceRequest";
 import { formatDate } from "../helper/dateFormator";
+import { encrypt } from "../helper/encryptionHelper";
+import { htmlGenerator } from "../helper/htmlGeneratorFromTemplate";
 import { InvoiceCalculator } from "../helper/invoiceCalculator";
 import { amountToWords } from "../helper/numberToWords";
 import { pdfGenerator } from "../helper/pdfGenerator";
-import { BusinessModel } from "../models/business.model";
+import { BusinessModel, IBusiness } from "../models/business.model";
+import { ClientModel, IClient } from "../models/client.model";
+import { CompanyModel, ICompany } from "../models/company.model";
 import { EmailLogModel } from "../models/emailLog.model";
 import { IInvoice, InvoiceModel } from "../models/invoice.model";
 import { InvoiceAmountModel } from "../models/invoiceamount.model";
 import { InvoiceItemModel } from "../models/invoiceitem.model";
+import { BaseRepository } from "../repositories/base.repository";
 import { InvoiceRepository } from "../repositories/invoice.repository";
 import { BaseService } from "../services/base.service";
 import { generateInvoiceEmailTemplate } from "../utils/emailTemplates";
+import { CompanyService } from "./company.service";
 import { MailService } from "./mail.service";
 export class InvoiceService extends BaseService<IInvoice> {
+  private companyService: CompanyService;
+  private clientService: BaseService<IClient>;
+  private bussinessRepository: BaseRepository<IBusiness>;
+
   constructor(public repo: InvoiceRepository) {
     super(repo);
+    this.companyService = new CompanyService(
+      new BaseRepository<ICompany>(CompanyModel)
+    );
+    this.clientService = new BaseService<IClient>(
+      new BaseRepository<IClient>(ClientModel)
+    );
+    this.bussinessRepository = new BaseRepository<IBusiness>(BusinessModel);
   }
 
   async history(filters: any) {
@@ -57,7 +75,7 @@ export class InvoiceService extends BaseService<IInvoice> {
     });
   }
 
-  async exportPdfFile(invoiceId: string): Promise<Buffer> {
+  async getInvoiceDetails(invoiceId: string) {
     if (!Types.ObjectId.isValid(invoiceId)) {
       throw new Error("Invalid invoice ID");
     }
@@ -109,7 +127,7 @@ export class InvoiceService extends BaseService<IInvoice> {
       .lean()
       .exec()) as any;
 
-    const pdfData = {
+    const data = {
       company: {
         name: invoice.company?.name ?? "",
         gstin: invoice.company?.gstin ?? "",
@@ -117,9 +135,9 @@ export class InvoiceService extends BaseService<IInvoice> {
         stateCode: invoice.company?.stateCode ?? "",
         state: invoice.company?.state ?? "",
         logo: invoice.company?.logo ?? "",
-        branch: invoice.company?.bankBranch ?? "",
-        account: invoice.company?.accountNumber ?? "",
-        ifsc: invoice.company?.ifscCode ?? "",
+        bankBranch: invoice.company?.bankBranch ?? "",
+        accountNumber: invoice.company?.accountNumber ?? "",
+        ifscCode: invoice.company?.ifscCode ?? "",
       },
       client: {
         name: invoice.client?.name ?? "",
@@ -128,8 +146,8 @@ export class InvoiceService extends BaseService<IInvoice> {
         state: invoice.client?.state ?? "",
       },
       invoice: {
-        number: invoice.invoiceNumber ?? "",
-        date: invoice.invoiceDate
+        invoiceNumber: invoice.invoiceNumber ?? "",
+        invoiceDate: invoice.invoiceDate
           ? formatDate(new Date(invoice.invoiceDate))
           : "",
         status: invoice.status ?? "Draft",
@@ -148,8 +166,8 @@ export class InvoiceService extends BaseService<IInvoice> {
       totals: invoiceAmount
         ? {
             subtotal: invoiceAmount.subtotal,
-            cgst: invoiceAmount.cgstAmount,
-            sgst: invoiceAmount.sgstAmount,
+            cgstAmount: invoiceAmount.cgstAmount,
+            sgstAmount: invoiceAmount.sgstAmount,
             grandTotal: invoiceAmount.grandTotal.toFixed(2),
             amountInWords: amountToWords(invoiceAmount.grandTotal),
           }
@@ -163,7 +181,102 @@ export class InvoiceService extends BaseService<IInvoice> {
       },
     };
 
-    return pdfGenerator(pdfData);
+    return data;
+  }
+
+  async exportPdfFile(invoiceId: string): Promise<Buffer> {
+    const pdfData = await this.getInvoiceDetails(invoiceId);
+
+    const html = await htmlGenerator(pdfData);
+    return await pdfGenerator(html);
+  }
+
+  async previewInvoice(
+    previewInvoiceRequest: PreviewInvoiceRequest
+  ): Promise<string> {
+    const company = await this.companyService.getById(
+      previewInvoiceRequest.company
+    );
+    const client = await this.clientService.getById(
+      previewInvoiceRequest.client
+    );
+
+    const business = (
+      await this.bussinessRepository.findAll({
+        email: "payinvoflow@gmail.com",
+      })
+    )[0];
+
+    const subtotalAmt = previewInvoiceRequest.items.reduce(
+      (sum: any, i: any) => sum + (i.amount ?? 0),
+      0
+    );
+
+    const { subtotal, cgstAmount, sgstAmount, grandTotal, amountInWords } =
+      await InvoiceCalculator.calculateTotals(
+        subtotalAmt,
+        company?.cgstRate,
+        company?.sgstRate
+      );
+
+    const invoiceData = {
+      company: {
+        name: company?.name ?? "xxxxx xxxxx",
+        gstin: company?.gstin ?? "xxxxxxxxx",
+        address: company?.address ?? "xxxxxxxxxxxxx",
+        stateCode: company?.stateCode ?? "xx",
+        state: company?.state ?? "xxxxxxxx",
+        logo: company?.logo ?? "",
+        bankBranch: company?.bankBranch ?? "xxxxxxxxxxxxx",
+        accountNumber: company?.accountNumber ?? "xxxxxxxxxxxx",
+        ifscCode: company?.ifscCode ?? "xxxxxxxxx",
+      },
+      client: {
+        name: client?.name ?? "xxxxxxxx",
+        gstin: client?.gstin ?? "xxxxxxxxxx",
+        address: client?.address ?? "xxxxxxxxxx",
+        state: client?.state ?? "xxxxxxxxx",
+      },
+      invoice: {
+        invoiceNumber: "xxxx",
+        invoiceDate: "xx-xx-xxxx",
+        cgstRate: company?.cgstRate ?? 0,
+        sgstRate: company?.sgstRate ?? 0,
+      },
+      invoiceItems: previewInvoiceRequest.items.map(
+        (item: any, idx: number) => ({
+          sr: idx + 1,
+          date: item.date ? formatDate(new Date(item.date)) : "",
+          vehicleNo: item.vehicleNo ?? "",
+          particulars: item.particulars ?? "",
+          quantity: item.quantity ?? 0,
+          rate: item.rate ?? 0,
+          amount: item.amount ?? 0,
+        })
+      ),
+      totals: {
+        subtotal: subtotal,
+        cgstAmount: cgstAmount,
+        sgstAmount: sgstAmount,
+        grandTotal: grandTotal.toFixed(2),
+        amountInWords: amountToWords(grandTotal),
+      },
+      business: {
+        name: business?.name ?? "",
+        email: business?.email ?? "",
+        ownerName: business?.ownerName ?? "",
+        contact: business?.contact ?? "",
+        logo: business?.logo ?? "",
+      },
+    };
+
+    // Generate HTML
+    const html = await htmlGenerator(invoiceData);
+
+    // Encrypt before returning
+    const encryptedHtml = encrypt(html);
+
+    return encryptedHtml;
   }
 
   async sendInvoiceEmail(invoiceId: string) {

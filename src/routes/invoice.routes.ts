@@ -328,5 +328,87 @@ router.get("/pdf", controller.exportPdfFile);
  *                   example: Invoice not found
  */
 router.post("/:invoiceId/send-email", controller.sendInvoiceEmail);
+/**
+ * @swagger
+ * /invoices/preview:
+ *   post:
+ *     summary: Preview Invoice (Encrypted HTML)
+ *     description: Generates a preview of the invoice and returns encrypted HTML.
+ *     tags:
+ *       - Invoices
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/PreviewInvoiceRequest'
+ *     responses:
+ *       200:
+ *         description: Encrypted HTML generated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 html:
+ *                   type: string
+ *                   description: Encrypted HTML string
+ *                   example: "r0O9i3kB8jZ4y8F6TnF1Vg==:Q9lHw8zE8vC6m4U4Y9XKug=="
+ *       400:
+ *         description: Invalid request payload
+ *       500:
+ *         description: Internal server error
+ *
+ * components:
+ *   schemas:
+ *     PreviewInvoiceRequest:
+ *       type: object
+ *       required:
+ *         - company
+ *         - client
+ *         - items
+ *       properties:
+ *         company:
+ *           type: string
+ *           example: "64f89acdb21e8e8e12345678"
+ *         client:
+ *           type: string
+ *           example: "64f89bcd1234abcd56781234"
+ *         items:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/InvoiceItem'
+ *
+ *     InvoiceItem:
+ *       type: object
+ *       required:
+ *         - date
+ *         - particulars
+ *         - vehicleNo
+ *         - quantity
+ *         - rate
+ *         - amount
+ *       properties:
+ *         date:
+ *           type: string
+ *           format: date
+ *           example: "2025-09-25"
+ *         particulars:
+ *           type: string
+ *           example: "Transport service"
+ *         vehicleNo:
+ *           type: string
+ *           example: "MH12AB1234"
+ *         quantity:
+ *           type: integer
+ *           example: 5
+ *         rate:
+ *           type: number
+ *           example: 1200
+ *         amount:
+ *           type: number
+ *           example: 6000
+ */
+router.post("/preview", (req, res) => controller.previewInvoice(req, res));
 
 export default router;
