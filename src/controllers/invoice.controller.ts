@@ -53,7 +53,7 @@ export class InvoiceController extends BaseController<IInvoice> {
         invoiceNo: item.invoiceNo,
         quantity: item.quantity ?? 1,
         rate: item.rate,
-        amount: item.quantity ?? 1 * item.rate,
+        amount: (item.quantity ?? 1) * item.rate,
       }));
 
       invoiceItemsModel.forEach(async (item: any) => {

@@ -161,7 +161,7 @@ export class InvoiceService extends BaseService<IInvoice> {
         particulars: item.particulars ?? "",
         quantity: item.quantity ?? 0,
         rate: item.rate ?? 0,
-        amount: item.amount ?? 0,
+        amount: (item.quantity ?? 1) * (item.rate ?? 0),
       })),
       totals: invoiceAmount
         ? {
