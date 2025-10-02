@@ -2,6 +2,7 @@ import mongoose, { Document, Schema } from "mongoose";
 
 export interface IInvoice extends Document {
   invoiceNumber: string;
+  invoiceName?: string;
   invoiceDate: Date;
   client: mongoose.Types.ObjectId;
   company: mongoose.Types.ObjectId;
@@ -14,6 +15,7 @@ export interface IInvoice extends Document {
 const InvoiceSchema = new Schema<IInvoice>(
   {
     invoiceNumber: { type: String, required: true, unique: true },
+    invoiceName: { type: String },
     invoiceDate: { type: Date, required: true },
     client: { type: Schema.Types.ObjectId, ref: "Client", required: true },
     company: { type: Schema.Types.ObjectId, ref: "Company", required: true },

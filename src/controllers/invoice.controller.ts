@@ -74,6 +74,7 @@ export class InvoiceController extends BaseController<IInvoice> {
       // Update invoice
       const invoiceModel = {
         invoiceNumber: req.body.invoiceNumber,
+        invoiceName: req.body.invoiceName,
         invoiceDate: req.body.invoiceDate,
         client: req.body.client,
         company: req.body.company,
