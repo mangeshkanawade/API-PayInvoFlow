@@ -139,6 +139,16 @@ export class InvoiceController extends BaseController<IInvoice> {
     }
   }
 
+  async searchInvoices(req: Request, res: Response): Promise<void> {
+    try {
+      const invoiceId: string = req.query.invoice as string;
+      const result = await this.invoiceService.getInvoiceSearchData(invoiceId);
+      res.json(result);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+
   // Fetch invoice history
   history = async (req: Request, res: Response) => {
     const result = await this.invoiceService.history(req.query);

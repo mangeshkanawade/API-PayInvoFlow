@@ -285,6 +285,59 @@ router.get("/company/:companyId", controller.getByCompany);
 router.get("/pdf", controller.exportPdfFile);
 
 /**
+ * @openapi
+ * /invoices/search:
+ *   post:
+ *     summary: Search invoices
+ *     description: Fetch invoice list with minimal details for search/display in table
+ *     tags: [Invoices]
+ *     requestBody:
+ *       required: false
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               invoiceId:
+ *                 type: string
+ *                 description: Filter by specific invoice ID (optional)
+ *               companyName:
+ *                 type: string
+ *                 description: Filter by company name (optional)
+ *               clientName:
+ *                 type: string
+ *                 description: Filter by client name (optional)
+ *               status:
+ *                 type: string
+ *                 enum: [Draft, Paid, Cancelled]
+ *                 description: Filter by invoice status (optional)
+ *     responses:
+ *       200:
+ *         description: List of invoices retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                   invoiceNumber:
+ *                     type: string
+ *                   companyName:
+ *                     type: string
+ *                   clientName:
+ *                     type: string
+ *                   status:
+ *                     type: string
+ *                     enum: [Draft, Paid, Cancelled]
+ *                   amount:
+ *                     type: number
+ */
+router.post("/search", (req, res) => controller.searchInvoices(req, res));
+
+/**
  * @swagger
  * /invoices/{invoiceId}/send-email:
  *   post:

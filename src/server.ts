@@ -32,8 +32,12 @@ app.use(express.static(path.join(__dirname, "../public")));
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
+      // Allow requests with no origin (like mobile apps or curl)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        // Echo back the origin
+        callback(null, origin);
       } else {
         callback(new Error("Not allowed by CORS"));
       }

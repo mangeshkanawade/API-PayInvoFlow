@@ -184,6 +184,66 @@ export class InvoiceService extends BaseService<IInvoice> {
     return data;
   }
 
+  async getInvoiceSearchData(invoiceId?: string) {
+    const filter: any = {};
+    if (invoiceId) {
+      if (!Types.ObjectId.isValid(invoiceId)) {
+        throw new Error("Invalid invoice ID");
+      }
+      filter._id = invoiceId;
+    }
+
+    // Get invoices and their totals
+    const invoices = (await InvoiceModel.find(filter)
+      .populate("company", "name") // only need name for search
+      .populate("client", "name") // only need name for search
+      .lean()
+      .exec()) as any;
+
+    // Get totals for all invoices in one query
+    const invoiceIds = invoices.map((i: any) => i._id);
+    const amounts = await InvoiceAmountModel.find({
+      invoice: { $in: invoiceIds },
+    })
+      .lean()
+      .exec();
+
+    const amountMap = amounts.reduce((acc: any, amt: any) => {
+      acc[amt.invoice.toString()] = amt.grandTotal ?? 0;
+      return acc;
+    }, {} as Record<string, number>);
+
+    // Format search data
+    const data = invoices
+      .map((inv: any) => ({
+        id: inv._id,
+        invoiceNumber: inv.invoiceNumber ?? "",
+        invoiceDate: inv.invoiceDate ? new Date(inv.invoiceDate) : null, // keep as Date for sorting
+        companyName: inv.company?.name ?? "",
+        clientName: inv.client?.name ?? "",
+        status: inv.status ?? "Draft",
+        amount: amountMap[inv._id.toString()] ?? 0,
+      }))
+      .sort((a: any, b: any) => {
+        // First, sort by date descending
+        const dateA = a.invoiceDate?.getTime() ?? 0;
+        const dateB = b.invoiceDate?.getTime() ?? 0;
+
+        if (dateB !== dateA) {
+          return dateB - dateA; // Descending
+        }
+
+        // If dates are equal, sort by invoiceNumber ascending
+        return a.invoiceNumber.localeCompare(b.invoiceNumber);
+      })
+      .map((inv: any) => ({
+        ...inv,
+        invoiceDate: inv.invoiceDate ? formatDate(inv.invoiceDate) : "", // format string after sorting
+      }));
+
+    return data;
+  }
+
   async exportPdfFile(invoiceId: string): Promise<Buffer> {
     const pdfData = await this.getInvoiceDetails(invoiceId);
 
